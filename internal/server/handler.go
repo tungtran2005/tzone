@@ -7,12 +7,14 @@ import (
 	"github.com/LuuDinhTheTai/tzone/internal/delivery/route"
 	"github.com/LuuDinhTheTai/tzone/internal/repository"
 	"github.com/LuuDinhTheTai/tzone/internal/service"
+	// "github.com/supabase-community/postgrest-go"
 )
 
 func (s *Server) MapHandlers() error {
 	// Init repository
 	mongoDBRepo := repository.NewMongoDbRepository()
-	//postgreRepo := repository.NewPostgreRepository()
+	postgreRepo := repository.NewPostgreRepository(s.db)
+	userRepo := repository.NewUserRepository(postgreRepo.DB)
 	log.Printf("✅ Repositories initialized")
 
 	// Init service
@@ -31,6 +33,11 @@ func (s *Server) MapHandlers() error {
 	route.MapBrandRoutes(s.r, brandHandler)
 	route.MapDeviceRoutes(s.r, deviceHandler)
 	log.Printf("✅ Routes initialized")
+	//
+	authService := service.NewAuthService(userRepo)
 
+	authHandler := handler.NewAuthHandler(authService)
+
+	route.MapAuthRoutes(s.r, authHandler)
 	return nil
 }

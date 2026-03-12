@@ -1,8 +1,13 @@
 package repository
 
+import "gorm.io/gorm"
+
 type PostgreRepository struct {
+	DB *gorm.DB
 }
 
-func NewPostgreRepository() *PostgreRepository {
-	return &PostgreRepository{}
+func NewPostgreRepository(db *gorm.DB) *PostgreRepository {
+	return &PostgreRepository{
+		DB: db,
+	}
 }

@@ -9,6 +9,9 @@ import (
 	"github.com/LuuDinhTheTai/tzone/infrastructure/database"
 	server2 "github.com/LuuDinhTheTai/tzone/internal/server"
 	"github.com/gin-gonic/gin"
+
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 func main() {
@@ -28,6 +31,25 @@ func main() {
 
 	log.Println("✅ Configuration validated successfully")
 
+	// Connect to PostgreSQL
+	var db *gorm.DB
+
+	if cfg.Database.Supabase.URL != "" {
+
+		dbTemp, err := gorm.Open(
+			postgres.Open(cfg.Database.Supabase.URL),
+			&gorm.Config{},
+		)
+
+		if err != nil {
+			log.Fatalf("❌ PostgreSQL connection failed: %v", err)
+		}
+
+		db = dbTemp
+		log.Println("✅ PostgreSQL connected")
+	} else {
+		log.Println("⚠️ PostgreSQL not configured")
+	}
 	// Connect to MongoDB
 	var mongoClient interface{}
 
@@ -76,7 +98,7 @@ func main() {
 	r := gin.Default()
 
 	// Create server with available database connections
-	server := server2.NewServer(r, cfg, nil, mongoClient, supaClient)
+	server := server2.NewServer(r, cfg, db, mongoClient, supaClient)
 
 	// Start server
 	log.Printf("🌐 Starting HTTP server on port %s...", cfg.Server.Port)
