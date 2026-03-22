@@ -107,8 +107,8 @@ func (r *DeviceRepository) UpdateDevice(ctx context.Context, id string, device *
 
 	update := bson.M{
 		"$set": bson.M{
-			"model_name":    device.ModelName,
-			"specification": device.Specifications,
+			"model_name":     device.ModelName,
+			"specifications": device.Specifications,
 		},
 	}
 

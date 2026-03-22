@@ -4,104 +4,104 @@ import "go.mongodb.org/mongo-driver/v2/bson"
 
 type Device struct {
 	ID             bson.ObjectID  `bson:"_id,omitempty" json:"id,omitempty"`
-	ModelName      string         `bson:"model_name" json:"model_name" binding:"required"`
-	ImageUrl       string         `bson:"imageUrl" json:"imageUrl" binding:"required"`
-	Specifications Specifications `bson:"specifications" json:"specifications" binding:"required"`
+	ModelName      string         `bson:"model_name" json:"model_name,omitempty"`
+	ImageUrl       string         `bson:"imageUrl" json:"imageUrl,omitempty"`
+	Specifications Specifications `bson:"specifications" json:"specifications,omitempty"`
 }
 
 type Specifications struct {
-	Network      Network      `bson:"network" json:"network" binding:"required,min=1,max=100"`
-	Launch       Launch       `bson:"launch" json:"launch" binding:"required,min=1,max=100"`
-	Body         Body         `bson:"body" json:"body" binding:"required,min=1,max=100"`
-	Display      Display      `bson:"display" json:"display" binding:"required,min=1,max=100"`
-	Platform     Platform     `bson:"platform" json:"platform" binding:"required,min=1,max=100"`
-	Memory       Memory       `bson:"memory" json:"memory" binding:"required,min=1,max=100"`
-	MainCamera   MainCamera   `bson:"mainCamera" json:"mainCamera" binding:"required,min=1,max=100"`
-	SelfieCamera SelfieCamera `bson:"selfieCamera" json:"selfieCamera" binding:"required,min=1,max=100"`
-	Sound        Sound        `bson:"sound" json:"sound" binding:"required,min=1,max=100"`
-	Comms        Comms        `bson:"comms" json:"comms" binding:"required,min=1,max=100"`
-	Features     Features     `bson:"features" json:"features" binding:"required,min=1,max=100"`
-	Battery      Battery      `bson:"battery" json:"battery" binding:"required,min=1,max=100"`
-	Misc         Misc         `bson:"misc" json:"misc" binding:"required,min=1,max=100"`
+	Network      Network      `bson:"network" json:"network,omitempty"`
+	Launch       Launch       `bson:"launch" json:"launch,omitempty"`
+	Body         Body         `bson:"body" json:"body,omitempty"`
+	Display      Display      `bson:"display" json:"display,omitempty"`
+	Platform     Platform     `bson:"platform" json:"platform,omitempty"`
+	Memory       Memory       `bson:"memory" json:"memory,omitempty"`
+	MainCamera   MainCamera   `bson:"mainCamera" json:"mainCamera,omitempty"`
+	SelfieCamera SelfieCamera `bson:"selfieCamera" json:"selfieCamera,omitempty"`
+	Sound        Sound        `bson:"sound" json:"sound,omitempty"`
+	Comms        Comms        `bson:"comms" json:"comms,omitempty"`
+	Features     Features     `bson:"features" json:"features,omitempty"`
+	Battery      Battery      `bson:"battery" json:"battery,omitempty"`
+	Misc         Misc         `bson:"misc" json:"misc,omitempty"`
 }
 
 type Network struct {
-	Technology string `bson:"technology" json:"technology" binding:"required,min=1,max=100"`
-	Bands2G    string `bson:"bands_2g" json:"bands_2g" binding:"required,min=1,max=100"`
-	Bands3G    string `bson:"bands_3g" json:"bands_3g" binding:"required,min=1,max=100"`
-	Bands4G    string `bson:"bands_4g" json:"bands_4g" binding:"required,min=1,max=100"`
-	Bands5G    string `bson:"bands_5g" json:"bands_5g" binding:"required,min=1,max=100"`
-	Speed      string `bson:"speed" json:"speed" binding:"required,min=1,max=100"`
+	Technology string `bson:"technology" json:"technology,omitempty"`
+	Bands2G    string `bson:"bands_2g" json:"bands_2g,omitempty"`
+	Bands3G    string `bson:"bands_3g" json:"bands_3g,omitempty"`
+	Bands4G    string `bson:"bands_4g" json:"bands_4g,omitempty"`
+	Bands5G    string `bson:"bands_5g" json:"bands_5g,omitempty"`
+	Speed      string `bson:"speed" json:"speed,omitempty"`
 }
 
 type Launch struct {
-	Announced string `bson:"announced" json:"announced" binding:"required,min=1,max=100"`
-	Status    string `bson:"status" json:"status" binding:"required,min=1,max=100"`
+	Announced string `bson:"announced" json:"announced,omitempty"`
+	Status    string `bson:"status" json:"status,omitempty"`
 }
 
 type Body struct {
-	Dimensions string `bson:"dimensions" json:"dimensions" binding:"required,min=1,max=100"`
-	Weight     string `bson:"weight" json:"weight" binding:"required,min=1,max=100"`
-	Build      string `bson:"build" json:"build" binding:"required,min=1,max=100"`
-	SIM        string `bson:"sim" json:"sim" binding:"required,min=1,max=100"`
-	IPRating   string `bson:"ip_rating" json:"ip_rating" binding:"required,min=1,max=100"`
+	Dimensions string `bson:"dimensions" json:"dimensions,omitempty"`
+	Weight     string `bson:"weight" json:"weight,omitempty"`
+	Build      string `bson:"build" json:"build,omitempty"`
+	SIM        string `bson:"sim" json:"sim,omitempty"`
+	IPRating   string `bson:"ip_rating" json:"ip_rating,omitempty"`
 }
 
 type Display struct {
-	Type       string `bson:"type" json:"type" binding:"required,min=1,max=100"`
-	Size       string `bson:"size" json:"size" binding:"required,min=1,max=100"`
-	Resolution string `bson:"resolution" json:"resolution" binding:"required,min=1,max=100"`
+	Type       string `bson:"type" json:"type,omitempty"`
+	Size       string `bson:"size" json:"size,omitempty"`
+	Resolution string `bson:"resolution" json:"resolution,omitempty"`
 }
 
 type Platform struct {
-	OS      string `bson:"os" json:"os" binding:"required,min=1,max=100"`
-	Chipset string `bson:"chipset" json:"chipset" binding:"required,min=1,max=100"`
-	CPU     string `bson:"cpu" json:"cpu" binding:"required,min=1,max=100"`
-	GPU     string `bson:"gpu" json:"gpu" binding:"required,min=1,max=100"`
+	OS      string `bson:"os" json:"os,omitempty"`
+	Chipset string `bson:"chipset" json:"chipset,omitempty"`
+	CPU     string `bson:"cpu" json:"cpu,omitempty"`
+	GPU     string `bson:"gpu" json:"gpu,omitempty"`
 }
 
 type Memory struct {
-	CardSlot string `bson:"card_slot" json:"card_lot" binding:"required,min=1,max=100"`
-	Internal string `bson:"internal" json:"internal" binding:"required,min=1,max=100"`
+	CardSlot string `bson:"card_slot" json:"card_lot,omitempty"`
+	Internal string `bson:"internal" json:"internal,omitempty"`
 }
 
 type MainCamera struct {
-	Triple   string `bson:"triple" json:"triple" binding:"required,min=1,max=100"`
-	Features string `bson:"features" json:"features" binding:"required,min=1,max=100"`
-	Single   string `bson:"single" json:"single" binding:"required,min=1,max=100"`
-	Video    string `bson:"video" json:"video" binding:"required,min=1,max=100"`
+	Triple   string `bson:"triple" json:"triple,omitempty"`
+	Features string `bson:"features" json:"features,omitempty"`
+	Single   string `bson:"single" json:"single,omitempty"`
+	Video    string `bson:"video" json:"video,omitempty"`
 }
 
 type SelfieCamera struct {
-	Single string `bson:"single" json:"single" binding:"required,min=1,max=100"`
-	Video  string `bson:"video" json:"video" binding:"required,min=1,max=100"`
+	Single string `bson:"single" json:"single,omitempty"`
+	Video  string `bson:"video" json:"video,omitempty"`
 }
 
 type Sound struct {
-	Loudspeaker string `bson:"loudspeaker" json:"loudspeaker" binding:"required,min=1,max=100"`
-	Jack35mm    string `bson:"jack_3.5mm" json:"jack_3.5mm" binding:"required,min=1,max=100"`
+	Loudspeaker string `bson:"loudspeaker" json:"loudspeaker,omitempty"`
+	Jack35mm    string `bson:"jack_3.5mm" json:"jack_3.5mm,omitempty"`
 }
 
 type Comms struct {
-	WLAN        string `bson:"wlan" json:"wlan" binding:"required,min=1,max=100"`
-	Bluetooth   string `bson:"bluetooth" json:"bluetooth" binding:"required,min=1,max=100"`
-	Positioning string `bson:"positioning" json:"positioning" binding:"required,min=1,max=100"`
-	NFC         string `bson:"nfc" json:"nfc" binding:"required,min=1,max=100"`
-	Radio       string `bson:"radio" json:"radio" binding:"required,min=1,max=100"`
-	USB         string `bson:"usb" json:"usb" binding:"required,min=1,max=100"`
+	WLAN        string `bson:"wlan" json:"wlan,omitempty"`
+	Bluetooth   string `bson:"bluetooth" json:"bluetooth,omitempty"`
+	Positioning string `bson:"positioning" json:"positioning,omitempty"`
+	NFC         string `bson:"nfc" json:"nfc,omitempty"`
+	Radio       string `bson:"radio" json:"radio,omitempty"`
+	USB         string `bson:"usb" json:"usb,omitempty"`
 }
 
 type Features struct {
-	Sensors string `bson:"sensors" json:"sensors" binding:"required,min=1,max=100"`
+	Sensors string `bson:"sensors" json:"sensors,omitempty"`
 }
 
 type Battery struct {
-	Type     string `bson:"type" json:"type" binding:"required,min=1,max=100"`
-	Charging string `bson:"charging" json:"charging" binding:"required,min=1,max=100"`
+	Type     string `bson:"type" json:"type,omitempty"`
+	Charging string `bson:"charging" json:"charging,omitempty"`
 }
 
 type Misc struct {
-	Colors string `bson:"colors" json:"colors" binding:"required,min=1,max=100"`
-	Models string `bson:"models" json:"models" binding:"required,min=1,max=100"`
-	Price  string `bson:"price" json:"price" binding:"required,min=1,max=100"`
+	Colors string `bson:"colors" json:"colors,omitempty"`
+	Models string `bson:"models" json:"models,omitempty"`
+	Price  string `bson:"price" json:"price,omitempty"`
 }
