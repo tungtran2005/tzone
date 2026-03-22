@@ -5,10 +5,10 @@ import (
 )
 
 type BrandService struct {
-	mongoDbRepo *repository.MongoDbRepository
+	mongoDbRepo *repository.DeviceRepository
 }
 
-func NewBrandService(mongoDbRepo *repository.MongoDbRepository) *BrandService {
+func NewBrandService(mongoDbRepo *repository.DeviceRepository) *BrandService {
 	return &BrandService{
 		mongoDbRepo: mongoDbRepo,
 	}
