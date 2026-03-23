@@ -27,7 +27,7 @@ func (s *Server) MapHandlers() error {
 
 	// Init service
 	brandService := service.NewBrandService(brandRepo)
-	deviceService := service.NewDeviceService(deviceRepo)
+	deviceService := service.NewDeviceService(deviceRepo, brandService)
 	log.Printf("✅ Services initialized")
 
 	// Init handler

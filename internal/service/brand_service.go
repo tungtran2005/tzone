@@ -8,6 +8,7 @@ import (
 	"github.com/LuuDinhTheTai/tzone/internal/dto"
 	"github.com/LuuDinhTheTai/tzone/internal/model"
 	"github.com/LuuDinhTheTai/tzone/internal/repository"
+	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
 type BrandService struct {
@@ -119,11 +120,53 @@ func (s *BrandService) UpdateBrand(ctx context.Context, id string, req dto.Updat
 func (s *BrandService) DeleteBrand(ctx context.Context, id string) error {
 	log.Printf("🔄 Deleting brand with ID: %s", id)
 
-	err := s.mongoDbRepo.DeleteBrand(ctx, id)
+	//  Get brand information before to check
+	brand, err := s.mongoDbRepo.GetBrandById(ctx, id)
+	if err != nil {
+		return fmt.Errorf("failed to find brand to delete: %w", err)
+	}
+
+	// Don't delete brand if still contains any device
+	if len(brand.Devices) > 0 {
+		return fmt.Errorf("cannot delete brand because it still contains %d device(s)", len(brand.Devices))
+	}
+
+	err = s.mongoDbRepo.DeleteBrand(ctx, id)
 	if err != nil {
 		return fmt.Errorf("failed to delete brand: %w", err)
 	}
 
 	log.Printf("✅ Brand deleted successfully")
 	return nil
+}
+
+// AddDeviceToBrand implements BrandUpdater interface
+func (s *BrandService) AddDeviceToBrand(ctx context.Context, brandID string, device *model.Device) error {
+	objID, err := bson.ObjectIDFromHex(brandID)
+	if err != nil {
+		return fmt.Errorf("invalid brand ID format: %w", err)
+	}
+	return s.mongoDbRepo.AddDeviceToBrand(ctx, objID, device)
+}
+
+// UpdateDeviceInBrand implements BrandUpdater interface
+func (s *BrandService) UpdateDeviceInBrand(ctx context.Context, brandID string, device *model.Device) error {
+	objID, err := bson.ObjectIDFromHex(brandID)
+	if err != nil {
+		return fmt.Errorf("invalid brand ID format: %w", err)
+	}
+	return s.mongoDbRepo.UpdateDeviceInBrand(ctx, objID, device)
+}
+
+// RemoveDeviceFromBrand implements BrandUpdater interface
+func (s *BrandService) RemoveDeviceFromBrand(ctx context.Context, brandID string, deviceID string) error {
+	objBrandID, err := bson.ObjectIDFromHex(brandID)
+	if err != nil {
+		return fmt.Errorf("invalid brand ID format: %w", err)
+	}
+	objDeviceID, err := bson.ObjectIDFromHex(deviceID)
+	if err != nil {
+		return fmt.Errorf("invalid device ID format: %w", err)
+	}
+	return s.mongoDbRepo.RemoveDeviceFromBrand(ctx, objBrandID, objDeviceID)
 }

@@ -23,6 +23,7 @@ type BrandListResponse struct {
 // DeviceResponse represents the response structure for a device
 type DeviceResponse struct {
 	ID             string               `json:"id,omitempty"`
+	BrandID        string               `json:"brand_id,omitempty"`
 	ModelName      string               `json:"model_name,omitempty"`
 	ImageUrl       string               `json:"imageUrl,omitempty"`
 	Specifications model.Specifications `json:"specifications,omitempty"`

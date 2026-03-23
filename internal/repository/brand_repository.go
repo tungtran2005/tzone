@@ -154,3 +154,60 @@ func (r *BrandRepository) DeleteBrand(ctx context.Context, id string) error {
 	log.Printf("✅ Brand deleted successfully: %s", id)
 	return nil
 }
+
+// AddDeviceToBrand pushes a new device into the brand's devices array
+func (r *BrandRepository) AddDeviceToBrand(ctx context.Context, brandID bson.ObjectID, device *model.Device) error {
+	collection := r.GetBrandCollection()
+
+	update := bson.M{
+		"$push": bson.M{"devices": device},
+		"$set":  bson.M{"updated_at": time.Now()},
+	}
+
+	_, err := collection.UpdateOne(ctx, bson.M{"_id": brandID}, update)
+	if err != nil {
+		log.Printf("❌ Error adding device to brand: %v", err)
+		return fmt.Errorf("failed to add device to brand: %w", err)
+	}
+
+	return nil
+}
+
+// UpdateDeviceInBrand updates an existing device within the brand's device array
+func (r *BrandRepository) UpdateDeviceInBrand(ctx context.Context, brandID bson.ObjectID, device *model.Device) error {
+	collection := r.GetBrandCollection()
+
+	filter := bson.M{"_id": brandID, "devices._id": device.ID}
+	update := bson.M{
+		"$set": bson.M{
+			"devices.$":  device,
+			"updated_at": time.Now(),
+		},
+	}
+
+	_, err := collection.UpdateOne(ctx, filter, update)
+	if err != nil {
+		log.Printf("❌ Error updating device in brand: %v", err)
+		return fmt.Errorf("failed to update device in brand: %w", err)
+	}
+
+	return nil
+}
+
+// RemoveDeviceFromBrand removes a device from the brand's devices array
+func (r *BrandRepository) RemoveDeviceFromBrand(ctx context.Context, brandID bson.ObjectID, deviceID bson.ObjectID) error {
+	collection := r.GetBrandCollection()
+
+	update := bson.M{
+		"$pull": bson.M{"devices": bson.M{"_id": deviceID}},
+		"$set":  bson.M{"updated_at": time.Now()},
+	}
+
+	_, err := collection.UpdateOne(ctx, bson.M{"_id": brandID}, update)
+	if err != nil {
+		log.Printf("❌ Error removing device from brand: %v", err)
+		return fmt.Errorf("failed to remove device from brand: %w", err)
+	}
+
+	return nil
+}
