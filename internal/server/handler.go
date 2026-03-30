@@ -12,6 +12,11 @@ import (
 )
 
 func (s *Server) MapHandlers() error {
+	// Check if MongoDB is available
+	if !s.HasMongoDB() {
+		log.Println("⚠️ MongoDB is not available, brand and device routes will not work properly")
+	}
+
 	// Init repository
 	mongoDBRepo := repository.NewMongoDbRepository()
 	
@@ -36,6 +41,18 @@ func (s *Server) MapHandlers() error {
 	brandService := service.NewBrandService(mongoDBRepo)
 	deviceService := service.NewDeviceService(mongoDBRepo)
 	permissionService := service.NewPermissionService(permissionRepo)
+	brandRepo := repository.NewBrandRepository()
+	deviceRepo := repository.NewBrandRepository()
+	if s.HasMongoDB() {
+		brandRepo.SetClient(s.mongoClient)
+		deviceRepo.SetClient(s.mongoClient)
+		log.Printf("✅ MongoDB client set in repositories")
+	}
+	log.Printf("✅ Repositories initialized")
+
+	// Init service
+	brandService := service.NewBrandService(brandRepo)
+	deviceService := service.NewDeviceService(deviceRepo)
 	log.Printf("✅ Services initialized")
 
 	// Init handler

@@ -1,104 +1,107 @@
 package model
 
+import "go.mongodb.org/mongo-driver/v2/bson"
+
 type Device struct {
-	ModelName      string         `bson:"model_name"`
-	ImageUrl       string         `bson:"imageUrl"`
-	Specifications Specifications `bson:"specifications"`
+	ID             bson.ObjectID  `bson:"_id,omitempty" json:"id,omitempty"`
+	ModelName      string         `bson:"model_name" json:"model_name,omitempty"`
+	ImageUrl       string         `bson:"imageUrl" json:"imageUrl,omitempty"`
+	Specifications Specifications `bson:"specifications" json:"specifications,omitempty"`
 }
 
 type Specifications struct {
-	Network      Network
-	Launch       Launch
-	Body         Body
-	Display      Display
-	Platform     Platform
-	Memory       Memory
-	MainCamera   MainCamera
-	SelfieCamera SelfieCamera
-	Sound        Sound
-	Comms        Comms
-	Features     Features
-	Battery      Battery
-	Misc         Misc
+	Network      Network      `bson:"Network" json:"network,omitempty"`
+	Launch       Launch       `bson:"Launch" json:"launch,omitempty"`
+	Body         Body         `bson:"Body" json:"body,omitempty"`
+	Display      Display      `bson:"Display" json:"display,omitempty"`
+	Platform     Platform     `bson:"Platform" json:"platform,omitempty"`
+	Memory       Memory       `bson:"Memory" json:"memory,omitempty"`
+	MainCamera   MainCamera   `bson:"Main Camera" json:"mainCamera,omitempty"`
+	SelfieCamera SelfieCamera `bson:"Selfie Camera" json:"selfieCamera,omitempty"`
+	Sound        Sound        `bson:"Sound" json:"sound,omitempty"`
+	Comms        Comms        `bson:"Comms" json:"comms,omitempty"`
+	Features     Features     `bson:"Features" json:"features,omitempty"`
+	Battery      Battery      `bson:"Battery" json:"battery,omitempty"`
+	Misc         Misc         `bson:"Misc" json:"misc,omitempty"`
 }
 
 type Network struct {
-	Technology string `bson:"Technology"`
-	Bands2G    string `bson:"2G bands"`
-	Bands3G    string `bson:"3G bands"`
-	Bands4G    string `bson:"4G bands"`
-	Bands5G    string `bson:"5G bands"`
-	Speed      string `bson:"Speed"`
+	Technology string `bson:"Technology" json:"technology,omitempty"`
+	Bands2G    string `bson:"2G Bands" json:"bands_2g,omitempty"`
+	Bands3G    string `bson:"3G Bands" json:"bands_3g,omitempty"`
+	Bands4G    string `bson:"4G Bands" json:"bands_4g,omitempty"`
+	Bands5G    string `bson:"5G Bands" json:"bands_5g,omitempty"`
+	Speed      string `bson:"Speed" json:"speed,omitempty"`
 }
 
 type Launch struct {
-	Announced string `bson:"Announced"`
-	Status    string `bson:"Status"`
+	Announced string `bson:"Announced" json:"announced,omitempty"`
+	Status    string `bson:"Status" json:"status,omitempty"`
 }
 
 type Body struct {
-	Dimensions string `bson:"Dimensions"`
-	Weight     string `bson:"Weight"`
-	Build      string `bson:"Build"`
-	SIM        string `bson:"SIM"`
-	IPRating   string `bson:"IP Rating"`
+	Dimensions string `bson:"Dimensions" json:"dimensions,omitempty"`
+	Weight     string `bson:"Weight" json:"weight,omitempty"`
+	Build      string `bson:"Build" json:"build,omitempty"`
+	SIM        string `bson:"SIM" json:"sim,omitempty"`
+	IPRating   string `bson:"IP Rating" json:"ip_rating,omitempty"`
 }
 
 type Display struct {
-	Type       string `bson:"Type"`
-	Size       string `bson:"Size"`
-	Resolution string `bson:"Resolution"`
+	Type       string `bson:"Type" json:"type,omitempty"`
+	Size       string `bson:"Size" json:"size,omitempty"`
+	Resolution string `bson:"Resolution" json:"resolution,omitempty"`
 }
 
 type Platform struct {
-	OS      string `bson:"OS"`
-	Chipset string `bson:"Chipset"`
-	CPU     string `bson:"CPU"`
-	GPU     string `bson:"GPU"`
+	OS      string `bson:"OS" json:"os,omitempty"`
+	Chipset string `bson:"Chipset" json:"chipset,omitempty"`
+	CPU     string `bson:"CPU" json:"cpu,omitempty"`
+	GPU     string `bson:"GPU" json:"gpu,omitempty"`
 }
 
 type Memory struct {
-	CardSlot string `bson:"Card Slot"`
-	Internal string `bson:"Internal"`
+	CardSlot string `bson:"Card Slot" json:"card_lot,omitempty"`
+	Internal string `bson:"Internal" json:"internal,omitempty"`
 }
 
 type MainCamera struct {
-	Triple   string `bson:"Triple"`
-	Features string `bson:"Features"`
-	Single   string `bson:"Single"`
-	Video    string `bson:"Video"`
+	Triple   string `bson:"Triple" json:"triple,omitempty"`
+	Features string `bson:"Features" json:"features,omitempty"`
+	Single   string `bson:"Single" json:"single,omitempty"`
+	Video    string `bson:"Video" json:"video,omitempty"`
 }
 
 type SelfieCamera struct {
-	Single string `bson:"Single"`
-	Video  string `bson:"Video"`
+	Single string `bson:"Single" json:"single,omitempty"`
+	Video  string `bson:"Video" json:"video,omitempty"`
 }
 
 type Sound struct {
-	Loudspeaker string `bson:"Loudspeaker"`
-	Jack35mm    string `bson:"3.5mm jack"`
+	Loudspeaker string `bson:"Loudspeaker" json:"loudspeaker,omitempty"`
+	Jack35mm    string `bson:"3.5mm Jack" json:"jack_3.5mm,omitempty"`
 }
 
 type Comms struct {
-	WLAN        string `bson:"WLAN"`
-	Bluetooth   string `bson:"Bluetooth"`
-	Positioning string `bson:"Positioning"`
-	NFC         string `bson:"NFC"`
-	Radio       string `bson:"Radio"`
-	USB         string `bson:"USB"`
+	WLAN        string `bson:"WLAN" json:"wlan,omitempty"`
+	Bluetooth   string `bson:"Bluetooth" json:"bluetooth,omitempty"`
+	Positioning string `bson:"Positioning" json:"positioning,omitempty"`
+	NFC         string `bson:"NFC" json:"nfc,omitempty"`
+	Radio       string `bson:"Radio" json:"radio,omitempty"`
+	USB         string `bson:"USB" json:"usb,omitempty"`
 }
 
 type Features struct {
-	Sensors string `bson:"Sensors"`
+	Sensors string `bson:"Sensors" json:"sensors,omitempty"`
 }
 
 type Battery struct {
-	Type     string `bson:"Type"`
-	Charging string `bson:"Charging"`
+	Type     string `bson:"Type" json:"type,omitempty"`
+	Charging string `bson:"Charging" json:"charging,omitempty"`
 }
 
 type Misc struct {
-	Colors string `bson:"Colors"`
-	Models string `bson:"Models"`
-	Price  string `bson:"Price"`
+	Colors string `bson:"colors" json:"colors,omitempty"`
+	Models string `bson:"models" json:"models,omitempty"`
+	Price  string `bson:"price" json:"price,omitempty"`
 }
