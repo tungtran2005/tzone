@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <header class="bg-white border-b">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+      <h1 class="text-xl font-bold">Admin Dashboard</h1>
+      <div class="space-x-3">
+        <a href="/" class="text-blue-600 text-sm">Home</a>
+        <button id="logout-btn" type="button" class="text-sm px-3 py-1 bg-red-600 text-white rounded">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 py-8">
+    <p id="admin-message"></p>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="bg-white border rounded p-5">
+        <p class="text-sm text-gray-600">Total Brands</p>
+        <p id="brand-total" class="text-3xl font-bold mt-2">0</p>
+      </div>
+      <div class="bg-white border rounded p-5">
+        <p class="text-sm text-gray-600">Total Devices</p>
+        <p id="device-total" class="text-3xl font-bold mt-2">0</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+      <a href="/admin/brands" class="bg-white border rounded p-5 hover:border-blue-500">
+        <h2 class="font-semibold">Manage Brands</h2>
+        <p class="text-sm text-gray-600 mt-1">Create, edit, and delete brands.</p>
+      </a>
+      <a href="/admin/devices" class="bg-white border rounded p-5 hover:border-blue-500">
+        <h2 class="font-semibold">Manage Devices</h2>
+        <p class="text-sm text-gray-600 mt-1">Create, edit, and delete devices.</p>
+      </a>
+    </div>
+  </main>
+
+  <script src="/assets/js/auth.js"></script>
+  <script src="/assets/js/api.js"></script>
+  <script src="/assets/js/ui.js"></script>
+  <script src="/assets/js/pages/admin.js"></script>
+</body>
+</html>
+

@@ -50,12 +50,14 @@ func (s *Server) MapHandlers() error {
 
 	// Init handler
 	commonHandler := handler.NewCommonHandler()
+	frontendHandler := handler.NewFrontendHandler()
 	brandHandler := handler.NewBrandHandler(brandService)
 	deviceHandler := handler.NewDeviceHandler(deviceService)
 	log.Printf("✅ Handlers initialized")
 
 	// Init route
 	route.MapCommonRoutes(s.r, commonHandler)
+	route.MapFrontendRoutes(s.r, frontendHandler)
 	route.MapBrandRoutes(s.r, brandHandler)
 	route.MapDeviceRoutes(s.r, deviceHandler)
 	log.Printf("✅ Routes initialized")

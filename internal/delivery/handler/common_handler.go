@@ -1,8 +1,6 @@
 package handler
 
 import (
-	"github.com/LuuDinhTheTai/tzone/util/response"
-	"github.com/LuuDinhTheTai/tzone/web/page"
 	"github.com/gin-gonic/gin"
 )
 
@@ -14,5 +12,5 @@ func NewCommonHandler() *CommonHandler {
 }
 
 func (h *CommonHandler) IndexHandler(ctx *gin.Context) {
-	response.HTML(ctx, page.HomePage())
+	ctx.File("web/frontend/pages/home.html")
 }

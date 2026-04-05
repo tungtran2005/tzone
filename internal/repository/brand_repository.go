@@ -17,6 +17,11 @@ type BrandRepository struct {
 	brandCollection string
 }
 
+type DeviceWithBrand struct {
+	BrandID bson.ObjectID `bson:"brand_id"`
+	Device  model.Device  `bson:"device"`
+}
+
 func NewBrandRepository() *BrandRepository {
 	return &BrandRepository{
 		database:        "Cluster0",
@@ -249,7 +254,7 @@ func (r *BrandRepository) GetDeviceById(ctx context.Context, id string) (*model.
 }
 
 // GetAllDevices retrieves paginated devices from all brand documents
-func (r *BrandRepository) GetAllDevices(ctx context.Context, page int, limit int) ([]model.Device, int64, error) {
+func (r *BrandRepository) GetAllDevices(ctx context.Context, page int, limit int) ([]DeviceWithBrand, int64, error) {
 	collection := r.GetBrandCollection()
 	skip := int64((page - 1) * limit)
 
@@ -284,8 +289,8 @@ func (r *BrandRepository) GetAllDevices(ctx context.Context, page int, limit int
 
 	dataPipeline := mongo.Pipeline{
 		{{Key: "$unwind", Value: "$devices"}},
-		{{Key: "$replaceRoot", Value: bson.M{"newRoot": "$devices"}}},
-		{{Key: "$sort", Value: bson.M{"_id": -1}}},
+		{{Key: "$project", Value: bson.M{"brand_id": "$_id", "device": "$devices"}}},
+		{{Key: "$sort", Value: bson.M{"device._id": -1}}},
 		{{Key: "$skip", Value: skip}},
 		{{Key: "$limit", Value: int64(limit)}},
 	}
@@ -301,7 +306,7 @@ func (r *BrandRepository) GetAllDevices(ctx context.Context, page int, limit int
 		}
 	}()
 
-	var devices []model.Device
+	var devices []DeviceWithBrand
 	if err = cursor.All(ctx, &devices); err != nil {
 		log.Printf("❌ Error decoding devices: %v", err)
 		return nil, 0, fmt.Errorf("failed to decode devices: %w", err)

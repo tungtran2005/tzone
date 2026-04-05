@@ -86,10 +86,11 @@ func (s *DeviceService) GetAllDevices(ctx context.Context, page int, limit int) 
 	var deviceResponses []dto.DeviceResponse
 	for _, device := range devices {
 		deviceResponses = append(deviceResponses, dto.DeviceResponse{
-			ID:             device.ID.Hex(),
-			ModelName:      device.ModelName,
-			ImageUrl:       device.ImageUrl,
-			Specifications: device.Specifications,
+			ID:             device.Device.ID.Hex(),
+			BrandID:        device.BrandID.Hex(),
+			ModelName:      device.Device.ModelName,
+			ImageUrl:       device.Device.ImageUrl,
+			Specifications: device.Device.Specifications,
 		})
 	}
 

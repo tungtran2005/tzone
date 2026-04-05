@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Brands</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <header class="bg-white border-b">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+      <h1 class="text-xl font-bold">Admin - Brands CRUD</h1>
+      <div class="space-x-3">
+        <a href="/admin" class="text-blue-600 text-sm">Admin Home</a>
+        <button id="logout-btn" type="button" class="text-sm px-3 py-1 bg-red-600 text-white rounded">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 py-8">
+    <section class="bg-white border rounded p-5">
+      <h2 class="font-semibold">Create Brand</h2>
+      <form id="create-brand-form" class="mt-4 flex flex-col md:flex-row gap-3">
+        <input id="brand-name" type="text" placeholder="Brand name" class="border rounded px-3 py-2 flex-1" required />
+        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded">Create</button>
+      </form>
+      <p id="brand-admin-message"></p>
+    </section>
+
+    <section class="bg-white border rounded p-5 mt-6 overflow-auto">
+      <h2 class="font-semibold mb-3">Brand List</h2>
+      <table class="min-w-full text-sm">
+        <thead>
+          <tr class="border-b text-left">
+            <th class="p-2">ID</th>
+            <th class="p-2">Name</th>
+            <th class="p-2">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="brand-table-body"></tbody>
+      </table>
+
+      <div class="mt-4 flex gap-3 items-center">
+        <button id="brand-prev-btn" type="button" class="px-3 py-1 bg-gray-200 rounded disabled:opacity-50">Previous</button>
+        <span id="brand-pagination-info" class="text-sm text-gray-600"></span>
+        <button id="brand-next-btn" type="button" class="px-3 py-1 bg-gray-200 rounded disabled:opacity-50">Next</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="/assets/js/auth.js"></script>
+  <script src="/assets/js/api.js"></script>
+  <script src="/assets/js/ui.js"></script>
+  <script src="/assets/js/pages/admin-brands.js"></script>
+</body>
+</html>
+
