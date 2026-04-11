@@ -7,15 +7,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func MapBrandRoutes(r *gin.Engine, brandHandler *handler.BrandHandler, authService *service.AuthService, permissionService *service.PermissionService) {
+func MapBrandRoutes(r *gin.Engine, brandHandler *handler.BrandHandler, permissionService *service.PermissionService) {
 	brandGroup := r.Group("/api/v1/brands")
 	{
 		brandGroup.GET("", brandHandler.GetAllBrands)
 		brandGroup.GET("/:id", brandHandler.GetBrandById)
 
 		// Protected endpoints
-		brandGroup.POST("", middleware.JWTAuth(authService), middleware.RBACAuth(permissionService), brandHandler.CreateBrand)
-		brandGroup.PUT("/:id", middleware.JWTAuth(authService), middleware.RBACAuth(permissionService), brandHandler.UpdateBrand)
-		brandGroup.DELETE("/:id", middleware.JWTAuth(authService), middleware.RBACAuth(permissionService), brandHandler.DeleteBrand)
+		brandGroup.POST("", middleware.JWTAuth(), middleware.RBACAuth(permissionService), brandHandler.CreateBrand)
+		brandGroup.PUT("/:id", middleware.JWTAuth(), middleware.RBACAuth(permissionService), brandHandler.UpdateBrand)
+		brandGroup.DELETE("/:id", middleware.JWTAuth(), middleware.RBACAuth(permissionService), brandHandler.DeleteBrand)
 	}
 }

@@ -65,9 +65,9 @@ func (s *Server) MapHandlers() error {
 
 	// Init route
 	route.MapCommonRoutes(s.r, commonHandler)
-	route.MapFrontendRoutes(s.r, frontendHandler)
-	route.MapBrandRoutes(s.r, brandHandler, authService, permissionService)
-	route.MapDeviceRoutes(s.r, deviceHandler, authService, permissionService)
+	route.MapFrontendRoutes(s.r, frontendHandler, permissionService)
+	route.MapBrandRoutes(s.r, brandHandler, permissionService)
+	route.MapDeviceRoutes(s.r, deviceHandler, permissionService)
 	route.MapAuthRoutes(s.r, authHandler)
 	log.Printf("✅ Routes initialized")
 

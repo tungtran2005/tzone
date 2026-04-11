@@ -55,9 +55,10 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
+	c.SetCookie("refresh_token", refreshToken, 7*24*60*60, "/", "", false, true)
+
 	response.Success(c, http.StatusOK, "login success", gin.H{
-		"access_token":  accessToken,
-		"refresh_token": refreshToken,
+		"access_token": accessToken,
 		"user": gin.H{
 			"id":    user.ID,
 			"email": user.Email,
@@ -67,42 +68,45 @@ func (h *AuthHandler) Login(c *gin.Context) {
 
 // RefreshToken endpoint
 func (h *AuthHandler) RefreshToken(c *gin.Context) {
-	var req struct {
-		RefreshToken string `json:"refresh_token" binding:"required"`
-	}
-
-	if err := c.ShouldBindJSON(&req); err != nil {
-		response.Error(c, http.StatusBadRequest, "refresh_token is required", nil)
+	// Read refresh token from HttpOnly cookie
+	refreshToken, err := c.Cookie("refresh_token")
+	if err != nil || refreshToken == "" {
+		response.Error(c, http.StatusUnauthorized, "refresh token cookie is missing", nil)
 		return
 	}
 
-	newAccessToken, newRefreshToken, _, err := h.authService.RefreshToken(req.RefreshToken)
+	newAccessToken, newRefreshToken, _, err := h.authService.RefreshToken(refreshToken)
 	if err != nil {
+		// Clear invalid cookie
+		c.SetCookie("refresh_token", "", -1, "/", "", false, true)
 		response.Error(c, http.StatusUnauthorized, err.Error(), nil)
 		return
 	}
 
+	// Rotate: set new refresh token in HttpOnly cookie
+	c.SetCookie("refresh_token", newRefreshToken, 7*24*60*60, "/", "", false, true)
+
+	// Return only new access token in body
 	response.Success(c, http.StatusOK, "token refreshed successfully", gin.H{
-		"access_token":  newAccessToken,
-		"refresh_token": newRefreshToken,
+		"access_token": newAccessToken,
 	})
 }
 
 // Logout endpoint
 func (h *AuthHandler) Logout(c *gin.Context) {
-	var req struct {
-		RefreshToken string `json:"refresh_token" binding:"required"`
-	}
-
-	if err := c.ShouldBindJSON(&req); err != nil {
-		response.Error(c, http.StatusBadRequest, "refresh_token is required", nil)
+	// Read refresh token from HttpOnly cookie
+	refreshToken, err := c.Cookie("refresh_token")
+	if err != nil || refreshToken == "" {
+		// No cookie — already logged out or never logged in
+		response.Success(c, http.StatusOK, "logged out successfully", nil)
 		return
 	}
 
-	if err := h.authService.Logout(req.RefreshToken); err != nil {
-		response.Error(c, http.StatusBadRequest, err.Error(), nil)
-		return
-	}
+	// Revoke refresh token in DB (ignore error — best effort)
+	_ = h.authService.Logout(refreshToken)
+
+	// Clear refresh token cookie
+	c.SetCookie("refresh_token", "", -1, "/", "", false, true)
 
 	response.Success(c, http.StatusOK, "logged out successfully", nil)
 }
