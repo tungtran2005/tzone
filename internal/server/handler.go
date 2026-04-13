@@ -8,6 +8,7 @@ import (
 	"github.com/LuuDinhTheTai/tzone/internal/model"
 	"github.com/LuuDinhTheTai/tzone/internal/repository"
 	"github.com/LuuDinhTheTai/tzone/internal/service"
+	"github.com/LuuDinhTheTai/tzone/util/seed"
 )
 
 func (s *Server) MapHandlers() error {
@@ -28,6 +29,9 @@ func (s *Server) MapHandlers() error {
 		&model.RolePermission{},
 	)
 
+	// Seed RBAC data
+	seed.SeedAll(s.db)
+
 	// Init repository
 	userRepo := repository.NewUserRepository(s.db)
 	tokenRepo := repository.NewRefreshTokenRepository(s.db)
@@ -42,6 +46,9 @@ func (s *Server) MapHandlers() error {
 	}
 	log.Printf("✅ Repositories initialized")
 
+	// Init auth service
+	authService := service.NewAuthService(userRepo, tokenRepo)
+
 	// Init service
 	brandService := service.NewBrandService(brandRepo)
 	deviceService := service.NewDeviceService(deviceRepo)
@@ -53,22 +60,16 @@ func (s *Server) MapHandlers() error {
 	frontendHandler := handler.NewFrontendHandler()
 	brandHandler := handler.NewBrandHandler(brandService)
 	deviceHandler := handler.NewDeviceHandler(deviceService)
+	authHandler := handler.NewAuthHandler(authService)
 	log.Printf("✅ Handlers initialized")
 
 	// Init route
 	route.MapCommonRoutes(s.r, commonHandler)
-	route.MapFrontendRoutes(s.r, frontendHandler)
-	route.MapBrandRoutes(s.r, brandHandler)
-	route.MapDeviceRoutes(s.r, deviceHandler)
-	log.Printf("✅ Routes initialized")
-
-	// Init auth service and routes
-	authService := service.NewAuthService(userRepo, tokenRepo)
-	authHandler := handler.NewAuthHandler(authService)
+	route.MapFrontendRoutes(s.r, frontendHandler, permissionService)
+	route.MapBrandRoutes(s.r, brandHandler, permissionService)
+	route.MapDeviceRoutes(s.r, deviceHandler, permissionService)
 	route.MapAuthRoutes(s.r, authHandler)
-
-	// Keep compiler happy since permissionService is meant to be used in protected routes
-	_ = permissionService
+	log.Printf("✅ Routes initialized")
 
 	return nil
 }

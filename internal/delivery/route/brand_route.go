@@ -2,16 +2,20 @@ package route
 
 import (
 	"github.com/LuuDinhTheTai/tzone/internal/delivery/handler"
+	"github.com/LuuDinhTheTai/tzone/internal/delivery/middleware"
+	"github.com/LuuDinhTheTai/tzone/internal/service"
 	"github.com/gin-gonic/gin"
 )
 
-func MapBrandRoutes(r *gin.Engine, brandHandler *handler.BrandHandler) {
+func MapBrandRoutes(r *gin.Engine, brandHandler *handler.BrandHandler, permissionService *service.PermissionService) {
 	brandGroup := r.Group("/api/v1/brands")
 	{
-		brandGroup.POST("", brandHandler.CreateBrand)       // Create a new brand
-		brandGroup.GET("", brandHandler.GetAllBrands)       // Get all brands
-		brandGroup.GET("/:id", brandHandler.GetBrandById)   // Get a brand by ID
-		brandGroup.PUT("/:id", brandHandler.UpdateBrand)    // Update a brand by ID
-		brandGroup.DELETE("/:id", brandHandler.DeleteBrand) // Delete a brand by ID
+		brandGroup.GET("", brandHandler.GetAllBrands)
+		brandGroup.GET("/:id", brandHandler.GetBrandById)
+
+		// Protected endpoints
+		brandGroup.POST("", middleware.JWTAuth(), middleware.RBACAuth(permissionService), brandHandler.CreateBrand)
+		brandGroup.PUT("/:id", middleware.JWTAuth(), middleware.RBACAuth(permissionService), brandHandler.UpdateBrand)
+		brandGroup.DELETE("/:id", middleware.JWTAuth(), middleware.RBACAuth(permissionService), brandHandler.DeleteBrand)
 	}
 }

@@ -51,7 +51,8 @@ func (s *AuthService) Register(email string, password string) error {
 		PasswordHash: string(hash),
 	}
 
-	return s.userRepo.Create(&user)
+	// Gắn role mặc định là User cho tài khoản mới đăng ký
+	return s.userRepo.Create(&user, model.RoleUser)
 }
 
 // login

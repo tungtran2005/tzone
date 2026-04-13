@@ -4,6 +4,11 @@ import (
 	"github.com/google/uuid"
 )
 
+const (
+	RoleAdmin = "admin"
+	RoleUser  = "user"
+)
+
 type Role struct {
 	ID   int32  `gorm:"primaryKey;column:id;autoIncrement"`
 	Name string `gorm:"uniqueIndex;not null;column:name"`
@@ -25,9 +30,10 @@ type Resource struct {
 }
 
 type Permission struct {
-	ID         uuid.UUID `gorm:"primaryKey;type:uuid;default:gen_random_uuid();column:id"`
-	ActionID   uuid.UUID `gorm:"type:uuid;not null;column:action_id"`
-	ResourceID uuid.UUID `gorm:"type:uuid;not null;column:resource_id"`
+	ID          uuid.UUID `gorm:"primaryKey;type:uuid;default:gen_random_uuid();column:id"`
+	ActionID    uuid.UUID `gorm:"type:uuid;not null;column:action_id"`
+	ResourceID  uuid.UUID `gorm:"type:uuid;not null;column:resource_id"`
+	Description string    `gorm:"column:description"`
 }
 
 type RolePermission struct {
