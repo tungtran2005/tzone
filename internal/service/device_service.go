@@ -177,6 +177,36 @@ func (s *DeviceService) GetDevicesByBrandId(ctx context.Context, brandID string,
 	return response, nil
 }
 
+// SearchDevicesByName retrieves paginated devices whose model name matches the provided query
+func (s *DeviceService) SearchDevicesByName(ctx context.Context, name string, page int, limit int) (*dto.DeviceListResponse, error) {
+	log.Printf("🔄 Searching devices by name: %s (page=%d, limit=%d)", name, page, limit)
+
+	devices, total, err := s.mongoDbRepo.SearchDevicesByName(ctx, name, page, limit)
+	if err != nil {
+		return nil, fmt.Errorf("failed to search devices: %w", err)
+	}
+
+	var deviceResponses []dto.DeviceResponse
+	for _, device := range devices {
+		deviceResponses = append(deviceResponses, dto.DeviceResponse{
+			ID:             device.Device.ID.Hex(),
+			BrandID:        device.BrandID.Hex(),
+			ModelName:      device.Device.ModelName,
+			ImageUrl:       device.Device.ImageUrl,
+			Specifications: device.Device.Specifications,
+		})
+	}
+
+	response := &dto.DeviceListResponse{
+		Devices:    deviceResponses,
+		Total:      int(total),
+		Pagination: buildPaginationMeta(total, page, limit),
+	}
+
+	log.Printf("✅ Retrieved %d matching devices", response.Total)
+	return response, nil
+}
+
 // UpdateDevice updates existing device and handles brand changing
 func (s *DeviceService) UpdateDevice(ctx context.Context, id string, req dto.UpdateDeviceRequest) (*dto.DeviceResponse, error) {
 	log.Printf("🔄 Updating device with ID: %s", id)

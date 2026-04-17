@@ -4,7 +4,8 @@ import { brandsApi } from '../api/brands';
 import type { Brand, PaginationMeta } from '../types';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import Pagination from '../components/ui/Pagination';
-import { Search, Tag } from 'lucide-react';
+import { SearchInput } from '../components/ui/SearchInput';
+import { Tag } from 'lucide-react';
 
 export default function BrandsPage() {
   const [brands, setBrands] = useState<Brand[]>([]);
@@ -14,13 +15,14 @@ export default function BrandsPage() {
   const [page, setPage] = useState(1);
 
   useEffect(() => {
-    fetchBrands(page);
-  }, [page]);
+    fetchBrands(page, search);
+  }, [page, search]);
 
-  const fetchBrands = async (p: number) => {
+  const fetchBrands = async (p: number, q: string) => {
     setLoading(true);
     try {
-      const { data } = await brandsApi.getAll(p, 12);
+      const request = q.trim() ? brandsApi.search(q.trim(), p, 12) : brandsApi.getAll(p, 12);
+      const { data } = await request;
       setBrands(data.data?.brands || []);
       setPagination(data.data?.pagination || null);
     } catch (err) {
@@ -29,12 +31,6 @@ export default function BrandsPage() {
       setLoading(false);
     }
   };
-
-  const filteredBrands = search
-    ? brands.filter((b) =>
-        b.brand_name?.toLowerCase().includes(search.toLowerCase())
-      )
-    : brands;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -45,28 +41,27 @@ export default function BrandsPage() {
       </div>
 
       {/* Search */}
-      <div className="relative max-w-md mb-8">
-        <Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted" />
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search brands..."
-          className="w-full pl-11 pr-4 py-2.5 rounded-xl bg-surface-light border border-border text-text-primary text-sm placeholder:text-text-muted focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-all"
-        />
-      </div>
+      <SearchInput
+        value={search}
+        onChange={(value) => {
+          setPage(1);
+          setSearch(value);
+        }}
+        placeholder="Search brands..."
+        className="max-w-md mb-8"
+      />
 
       {loading ? (
         <LoadingSpinner text="Loading brands..." />
-      ) : filteredBrands.length === 0 ? (
+      ) : brands.length === 0 ? (
         <div className="text-center py-20">
           <Tag size={48} className="mx-auto text-text-muted mb-4" />
-          <p className="text-text-secondary">No brands found</p>
+          <p className="text-text-secondary">No brands found{search ? ` for "${search}"` : ''}</p>
         </div>
       ) : (
         <>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            {filteredBrands.map((brand, i) => (
+            {brands.map((brand, i) => (
               <Link
                 key={brand.id}
                 to={`/brands/${brand.id}`}

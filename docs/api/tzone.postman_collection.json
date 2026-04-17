@@ -358,6 +358,59 @@
           "response": []
         },
         {
+          "name": "Search Brands By Name",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "const res = pm.response.json();",
+                  "pm.test('Response has search results', function () {",
+                  "  pm.expect(res.success).to.eql(true);",
+                  "  pm.expect(Array.isArray(res.data.brands)).to.eql(true);",
+                  "  pm.expect(res.data.pagination.page).to.eql(1);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/brands/search?name=apple&page=1&limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "brands",
+                "search"
+              ],
+              "query": [
+                {
+                  "key": "name",
+                  "value": "apple"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
           "name": "Get Brand By ID",
           "request": {
             "method": "GET",
@@ -525,6 +578,59 @@
                 "devices"
               ],
               "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Search Devices By Name",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "const res = pm.response.json();",
+                  "pm.test('Response has search results', function () {",
+                  "  pm.expect(res.success).to.eql(true);",
+                  "  pm.expect(Array.isArray(res.data.devices)).to.eql(true);",
+                  "  pm.expect(res.data.pagination.page).to.eql(1);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/devices/search?name=iphone&page=1&limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "devices",
+                "search"
+              ],
+              "query": [
+                {
+                  "key": "name",
+                  "value": "iphone"
+                },
                 {
                   "key": "page",
                   "value": "1"

@@ -143,9 +143,9 @@ export default function HomePage() {
                   </span>
                 </div>
                 <h3 className="text-sm font-semibold text-text-primary">{brand.brand_name}</h3>
-                <p className="text-xs text-text-muted mt-1">
-                  {brand.devices?.length || 0} devices
-                </p>
+                {/*<p className="text-xs text-text-muted mt-1">*/}
+                {/*  {brand.devices?.length || 0} devices*/}
+                {/*</p>*/}
               </Link>
             ))}
           </div>

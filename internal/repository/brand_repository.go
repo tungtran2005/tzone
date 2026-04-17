@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"regexp"
 
 	"github.com/LuuDinhTheTai/tzone/internal/model"
 	"go.mongodb.org/mongo-driver/v2/bson"
@@ -107,6 +108,41 @@ func (r *BrandRepository) GetAllBrands(ctx context.Context, page int, limit int)
 	}
 
 	log.Printf("✅ Retrieved %d brands", len(brands))
+	return brands, total, nil
+}
+
+// SearchBrandsByName retrieves paginated brands matching name
+func (r *BrandRepository) SearchBrandsByName(ctx context.Context, name string, page int, limit int) ([]model.Brand, int64, error) {
+	collection := r.GetBrandCollection()
+	skip := int64((page - 1) * limit)
+	pattern := regexp.QuoteMeta(name)
+	filter := bson.M{"brand_name": bson.M{"$regex": pattern, "$options": "i"}}
+
+	total, err := collection.CountDocuments(ctx, filter)
+	if err != nil {
+		log.Printf("❌ Error counting matching brands: %v", err)
+		return nil, 0, fmt.Errorf("failed to count matching brands: %w", err)
+	}
+
+	opts := options.Find().SetSkip(skip).SetLimit(int64(limit)).SetSort(bson.M{"_id": -1})
+	cursor, err := collection.Find(ctx, filter, opts)
+	if err != nil {
+		log.Printf("❌ Error fetching matching brands: %v", err)
+		return nil, 0, fmt.Errorf("failed to fetch matching brands: %w", err)
+	}
+	defer func() {
+		if err := cursor.Close(ctx); err != nil {
+			log.Printf("⚠️ Error closing cursor: %v", err)
+		}
+	}()
+
+	var brands []model.Brand
+	if err = cursor.All(ctx, &brands); err != nil {
+		log.Printf("❌ Error decoding matching brands: %v", err)
+		return nil, 0, fmt.Errorf("failed to decode matching brands: %w", err)
+	}
+
+	log.Printf("✅ Retrieved %d matching brands for name=%s", len(brands), name)
 	return brands, total, nil
 }
 
@@ -313,6 +349,73 @@ func (r *BrandRepository) GetAllDevices(ctx context.Context, page int, limit int
 	}
 
 	log.Printf("✅ Retrieved %d devices across all brands", len(devices))
+	return devices, total, nil
+}
+
+// SearchDevicesByName retrieves paginated devices matching model name across all brands
+func (r *BrandRepository) SearchDevicesByName(ctx context.Context, name string, page int, limit int) ([]DeviceWithBrand, int64, error) {
+	collection := r.GetBrandCollection()
+	skip := int64((page - 1) * limit)
+	pattern := regexp.QuoteMeta(name)
+	matchStage := bson.M{"devices.model_name": bson.M{"$regex": pattern, "$options": "i"}}
+
+	countPipeline := mongo.Pipeline{
+		{{Key: "$unwind", Value: "$devices"}},
+		{{Key: "$match", Value: matchStage}},
+		{{Key: "$count", Value: "total"}},
+	}
+
+	countCursor, err := collection.Aggregate(ctx, countPipeline)
+	if err != nil {
+		log.Printf("❌ Error counting matching devices: %v", err)
+		return nil, 0, fmt.Errorf("failed to count matching devices: %w", err)
+	}
+	defer func() {
+		if err := countCursor.Close(ctx); err != nil {
+			log.Printf("⚠️ Error closing count cursor: %v", err)
+		}
+	}()
+
+	var countResults []struct {
+		Total int64 `bson:"total"`
+	}
+	if err := countCursor.All(ctx, &countResults); err != nil {
+		log.Printf("❌ Error decoding matching device count: %v", err)
+		return nil, 0, fmt.Errorf("failed to decode matching device count: %w", err)
+	}
+
+	var total int64
+	if len(countResults) > 0 {
+		total = countResults[0].Total
+	}
+
+	dataPipeline := mongo.Pipeline{
+		{{Key: "$unwind", Value: "$devices"}},
+		{{Key: "$match", Value: matchStage}},
+		{{Key: "$project", Value: bson.M{"brand_id": "$_id", "device": "$devices"}}},
+		{{Key: "$sort", Value: bson.M{"device._id": -1}}},
+		{{Key: "$skip", Value: skip}},
+		{{Key: "$limit", Value: int64(limit)}},
+	}
+
+	cursor, err := collection.Aggregate(ctx, dataPipeline)
+	if err != nil {
+		log.Printf("❌ Error fetching matching devices: %v", err)
+		return nil, 0, fmt.Errorf("failed to fetch matching devices: %w", err)
+	}
+	defer func() {
+		if err := cursor.Close(ctx); err != nil {
+			log.Printf("⚠️ Error closing cursor: %v", err)
+		}
+	}()
+
+	var devices []DeviceWithBrand
+	if err = cursor.All(ctx, &devices); err != nil {
+		log.Printf("❌ Error decoding matching devices: %v", err)
+		return nil, 0, fmt.Errorf("failed to decode matching devices: %w", err)
+	}
+
+	log.Printf("✅ Retrieved %d matching devices for name=%s", len(devices), name)
 	return devices, total, nil
 }
 

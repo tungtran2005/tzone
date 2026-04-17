@@ -12,6 +12,7 @@ func MapBrandRoutes(r *gin.Engine, brandHandler *handler.BrandHandler, permissio
 	brandGroup.Use(middleware.APIRateLimit())
 	{
 		brandGroup.GET("", brandHandler.GetAllBrands)
+		brandGroup.GET("/search", brandHandler.SearchBrands)
 		brandGroup.GET("/:id", brandHandler.GetBrandById)
 
 		// Protected endpoints

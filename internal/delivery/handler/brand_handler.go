@@ -125,6 +125,43 @@ func (h *BrandHandler) GetAllBrands(ctx *gin.Context) {
 	response.Success(ctx, http.StatusOK, "Brands retrieved successfully", brands)
 }
 
+// SearchBrands handles GET request to search brands by name
+// @Summary Search brands by name
+// @Description Search brands using a case-insensitive name query
+// @Tags brands
+// @Accept json
+// @Produce json
+// @Param name query string true "Brand name"
+// @Param page query int false "Page number" default(1)
+// @Param limit query int false "Items per page (max 100)" default(10)
+// @Success 200 {object} response.ApiResponse{data=dto.BrandListResponse}
+// @Failure 400 {object} response.ApiResponse
+// @Failure 500 {object} response.ApiResponse
+// @Router /api/v1/brands/search [get]
+func (h *BrandHandler) SearchBrands(ctx *gin.Context) {
+	var query dto.SearchQuery
+	if err := ctx.ShouldBindQuery(&query); err != nil {
+		log.Printf("❌ Invalid search query: %v", err)
+		response.Error(ctx, http.StatusBadRequest, "Invalid search query", []response.ErrorResponse{
+			{Field: "query", Error: err.Error()},
+		})
+		return
+	}
+
+	query.Normalize()
+
+	brands, err := h.brandService.SearchBrandsByName(ctx.Request.Context(), query.Name, query.Page, query.Limit)
+	if err != nil {
+		log.Printf("❌ Failed to search brands: %v", err)
+		response.Error(ctx, http.StatusInternalServerError, "Failed to search brands", []response.ErrorResponse{
+			{Field: "server", Error: err.Error()},
+		})
+		return
+	}
+
+	response.Success(ctx, http.StatusOK, "Brands retrieved successfully", brands)
+}
+
 // UpdateBrand handles PUT request to update a brand
 // @Summary Update a brand
 // @Description Update brand information by ID

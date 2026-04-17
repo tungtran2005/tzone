@@ -157,6 +157,43 @@ func (h *DeviceHandler) GetAllDevices(ctx *gin.Context) {
 	response.Success(ctx, http.StatusOK, "Devices retrieved successfully", devices)
 }
 
+// SearchDevices handles GET request to search devices by name
+// @Summary Search devices by name
+// @Description Search devices using a case-insensitive model name query
+// @Tags devices
+// @Accept json
+// @Produce json
+// @Param name query string true "Device name"
+// @Param page query int false "Page number" default(1)
+// @Param limit query int false "Items per page (max 100)" default(10)
+// @Success 200 {object} response.ApiResponse{data=dto.DeviceListResponse}
+// @Failure 400 {object} response.ApiResponse
+// @Failure 500 {object} response.ApiResponse
+// @Router /api/v1/devices/search [get]
+func (h *DeviceHandler) SearchDevices(ctx *gin.Context) {
+	var query dto.SearchQuery
+	if err := ctx.ShouldBindQuery(&query); err != nil {
+		log.Printf("❌ Invalid search query: %v", err)
+		response.Error(ctx, http.StatusBadRequest, "Invalid search query", []response.ErrorResponse{
+			{Field: "query", Error: err.Error()},
+		})
+		return
+	}
+
+	query.Normalize()
+
+	devices, err := h.deviceService.SearchDevicesByName(ctx.Request.Context(), query.Name, query.Page, query.Limit)
+	if err != nil {
+		log.Printf("❌ Failed to search devices: %v", err)
+		response.Error(ctx, http.StatusInternalServerError, "Failed to search devices", []response.ErrorResponse{
+			{Field: "server", Error: err.Error()},
+		})
+		return
+	}
+
+	response.Success(ctx, http.StatusOK, "Devices retrieved successfully", devices)
+}
+
 // GetDevicesByBrandId handles GET request to retrieve devices by brand ID
 // @Summary Get devices by brand ID
 // @Description Get a paginated list of devices for a specific brand

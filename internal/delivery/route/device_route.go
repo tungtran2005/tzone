@@ -12,6 +12,7 @@ func MapDeviceRoutes(r *gin.Engine, deviceHandler *handler.DeviceHandler, permis
 	deviceGroup.Use(middleware.APIRateLimit())
 	{
 		deviceGroup.GET("", deviceHandler.GetAllDevices)
+		deviceGroup.GET("/search", deviceHandler.SearchDevices)
 		deviceGroup.GET("/brand/:brandId", deviceHandler.GetDevicesByBrandId)
 		deviceGroup.GET("/:id", deviceHandler.GetDeviceById)
 

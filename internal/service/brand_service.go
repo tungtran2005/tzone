@@ -102,6 +102,33 @@ func (s *BrandService) GetAllBrands(ctx context.Context, page int, limit int) (*
 	return response, nil
 }
 
+// SearchBrandsByName retrieves paginated brands matching name
+func (s *BrandService) SearchBrandsByName(ctx context.Context, name string, page int, limit int) (*dto.BrandListResponse, error) {
+	log.Printf("🔄 Searching brands by name=%s (page=%d, limit=%d)", name, page, limit)
+
+	brands, total, err := s.mongoDbRepo.SearchBrandsByName(ctx, name, page, limit)
+	if err != nil {
+		return nil, fmt.Errorf("failed to search brands: %w", err)
+	}
+
+	var brandResponses []dto.BrandResponse
+	for _, brand := range brands {
+		brandResponses = append(brandResponses, dto.BrandResponse{
+			Id:   brand.Id.Hex(),
+			Name: brand.Name,
+		})
+	}
+
+	response := &dto.BrandListResponse{
+		Brands:     brandResponses,
+		Total:      int(total),
+		Pagination: buildPaginationMeta(total, page, limit),
+	}
+
+	log.Printf("✅ Retrieved %d matching brands", response.Total)
+	return response, nil
+}
+
 // UpdateBrand updates an existing brand
 func (s *BrandService) UpdateBrand(ctx context.Context, id string, req dto.UpdateBrandRequest) (*dto.BrandResponse, error) {
 	log.Printf("🔄 Updating brand with ID: %s", id)

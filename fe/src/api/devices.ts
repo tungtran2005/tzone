@@ -26,6 +26,11 @@ export const devicesApi = {
       params: { page, limit },
     }),
 
+  search: (name: string, page = 1, limit = 10) =>
+    client.get<ApiResponse<DeviceListResponse>>('/api/v1/devices/search', {
+      params: { name, page, limit },
+    }),
+
   getById: (id: string) =>
     client.get<ApiResponse<Device>>(`/api/v1/devices/${id}`),
 

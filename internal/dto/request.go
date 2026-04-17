@@ -31,6 +31,11 @@ func (q *PaginationQuery) Normalize() {
 	}
 }
 
+type SearchQuery struct {
+	Name string `form:"name" binding:"required,min=1,max=100"`
+	PaginationQuery
+}
+
 type RegisterRequest struct {
 	Email    string `json:"email" binding:"required,email"`
 	Password string `json:"password" binding:"required,min=6"`

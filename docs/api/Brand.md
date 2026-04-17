@@ -8,6 +8,7 @@ This document provides details about the API endpoints for managing brands.
 | :--- | :------------------ | :--------------------- | :------------------------------------------------ |
 | POST | `/api/v1/brands`    | Create a new brand     | `Brand` object (see structure below)              |
 | GET  | `/api/v1/brands`    | Get all brands         | -                                                 |
+| GET  | `/api/v1/brands/search`    | Search brands by name  | Query params: `name`, `page`, `limit`             |
 | GET  | `/api/v1/brands/:id`| Get a brand by ID      | -                                                 |
 | PUT  | `/api/v1/brands/:id`| Update a brand by ID   | `Brand` object (fields to be updated)             |
 | DELETE | `/api/v1/brands/:id`| Delete a brand by ID   | -                                                 |

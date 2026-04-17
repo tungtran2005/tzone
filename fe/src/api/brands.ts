@@ -13,6 +13,11 @@ export const brandsApi = {
       params: { page, limit },
     }),
 
+  search: (name: string, page = 1, limit = 10) =>
+    client.get<ApiResponse<BrandListResponse>>('/api/v1/brands/search', {
+      params: { name, page, limit },
+    }),
+
   getById: (id: string) =>
     client.get<ApiResponse<Brand>>(`/api/v1/brands/${id}`),
 

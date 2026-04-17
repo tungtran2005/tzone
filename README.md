@@ -370,6 +370,14 @@ GET /devices
 }
 ```
 
+#### Tìm Thiết Bị Theo Tên
+```http
+GET /devices/search?name=iphone&page=1&limit=10
+```
+**Response:** `200 OK`
+
+Trả về danh sách device có `model_name` khớp một phần với tham số `name` theo kiểu không phân biệt hoa/thường.
+
 #### Tạo Thiết Bị Mới
 ```http
 POST /devices
@@ -434,6 +442,14 @@ GET /brands
   ]
 }
 ```
+
+#### Tìm Nhãn Hiệu Theo Tên
+```http
+GET /brands/search?name=apple&page=1&limit=10
+```
+**Response:** `200 OK`
+
+Trả về danh sách brand có `brand_name` khớp một phần với tham số `name` theo kiểu không phân biệt hoa/thường.
 
 #### Tạo Nhãn Hiệu Mới
 ```http

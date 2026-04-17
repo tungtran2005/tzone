@@ -5,6 +5,7 @@ import type { Device, Brand, PaginationMeta, Specifications } from '../../types'
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
 import Pagination from '../../components/ui/Pagination';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
+import { SearchInput } from '../../components/ui/SearchInput';
 import { resolveDeviceImageUrl } from '../../utils/resolveDeviceImageUrl';
 import { Plus, Pencil, Trash2, X, Smartphone } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -31,6 +32,7 @@ export default function DeviceManagePage() {
   const [pagination, setPagination] = useState<PaginationMeta | null>(null);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
+  const [search, setSearch] = useState('');
 
   // Modal
   const [modalOpen, setModalOpen] = useState(false);
@@ -58,13 +60,14 @@ export default function DeviceManagePage() {
   }, [imagePreview]);
 
   useEffect(() => {
-    fetchDevices(page);
-  }, [page]);
+    fetchDevices(page, search);
+  }, [page, search]);
 
-  const fetchDevices = async (p: number) => {
+  const fetchDevices = async (p: number, q: string) => {
     setLoading(true);
     try {
-      const { data } = await devicesApi.getAll(p, 10);
+      const request = q.trim() ? devicesApi.search(q.trim(), p, 10) : devicesApi.getAll(p, 10);
+      const { data } = await request;
       setDevices(data.data?.devices || []);
       setPagination(data.data?.pagination || null);
     } catch {
@@ -149,7 +152,7 @@ export default function DeviceManagePage() {
         toast.success('Device created');
       }
       setModalOpen(false);
-      fetchDevices(page);
+      fetchDevices(page, search);
     } catch (err: any) {
       toast.error(err.response?.data?.message || 'Operation failed');
     } finally {
@@ -164,7 +167,7 @@ export default function DeviceManagePage() {
       await devicesApi.delete(deleteTarget.id);
       toast.success('Device deleted');
       setDeleteTarget(null);
-      fetchDevices(page);
+      fetchDevices(page, search);
     } catch (err: any) {
       toast.error(err.response?.data?.message || 'Delete failed');
     } finally {
@@ -297,12 +300,22 @@ export default function DeviceManagePage() {
         </button>
       </div>
 
+      <SearchInput
+        value={search}
+        onChange={(value) => {
+          setPage(1);
+          setSearch(value);
+        }}
+        placeholder="Search devices..."
+        className="max-w-md mb-6"
+      />
+
       {loading ? (
         <LoadingSpinner text="Loading devices..." />
       ) : devices.length === 0 ? (
         <div className="glass rounded-2xl p-12 text-center">
           <Smartphone size={48} className="mx-auto text-text-muted mb-4" />
-          <p className="text-text-secondary">No devices found</p>
+          <p className="text-text-secondary">No devices found{search ? ` for "${search}"` : ''}</p>
           <button onClick={openCreate} className="mt-4 text-sm text-primary hover:text-primary-light font-medium">
             Create your first device
           </button>

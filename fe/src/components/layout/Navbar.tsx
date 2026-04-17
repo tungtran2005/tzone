@@ -2,6 +2,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { Menu, X, Smartphone, LogOut, Shield, ChevronDown } from 'lucide-react';
+import DeviceSearchBar from './DeviceSearchBar';
 
 export default function Navbar() {
   const { isAuthenticated, user, logout } = useAuth();
@@ -51,6 +52,11 @@ export default function Navbar() {
                 {link.label}
               </Link>
             ))}
+          </div>
+
+          {/* Header Search */}
+          <div className="hidden md:block w-72 lg:w-80">
+            <DeviceSearchBar />
           </div>
 
           {/* Desktop Auth */}
@@ -120,6 +126,9 @@ export default function Navbar() {
       {mobileOpen && (
         <div className="md:hidden border-t border-border animate-fadeIn">
           <div className="px-4 py-4 space-y-1">
+            <div className="pb-3">
+              <DeviceSearchBar placeholder="Search devices in header..." />
+            </div>
             {navLinks.map((link) => (
               <Link
                 key={link.to}

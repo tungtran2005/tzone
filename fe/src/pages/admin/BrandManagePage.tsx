@@ -4,6 +4,7 @@ import type { Brand, PaginationMeta } from '../../types';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
 import Pagination from '../../components/ui/Pagination';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
+import { SearchInput } from '../../components/ui/SearchInput';
 import { Plus, Pencil, Trash2, X, Tag } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -12,6 +13,7 @@ export default function BrandManagePage() {
   const [pagination, setPagination] = useState<PaginationMeta | null>(null);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
+  const [search, setSearch] = useState('');
 
   // Modal state
   const [modalOpen, setModalOpen] = useState(false);
@@ -24,13 +26,14 @@ export default function BrandManagePage() {
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
-    fetchBrands(page);
-  }, [page]);
+    fetchBrands(page, search);
+  }, [page, search]);
 
-  const fetchBrands = async (p: number) => {
+  const fetchBrands = async (p: number, q: string) => {
     setLoading(true);
     try {
-      const { data } = await brandsApi.getAll(p, 10);
+      const request = q.trim() ? brandsApi.search(q.trim(), p, 10) : brandsApi.getAll(p, 10);
+      const { data } = await request;
       setBrands(data.data?.brands || []);
       setPagination(data.data?.pagination || null);
     } catch {
@@ -67,7 +70,7 @@ export default function BrandManagePage() {
         toast.success('Brand created');
       }
       setModalOpen(false);
-      fetchBrands(page);
+      fetchBrands(page, search);
     } catch (err: any) {
       toast.error(err.response?.data?.message || 'Operation failed');
     } finally {
@@ -82,7 +85,7 @@ export default function BrandManagePage() {
       await brandsApi.delete(deleteTarget.id);
       toast.success('Brand deleted');
       setDeleteTarget(null);
-      fetchBrands(page);
+      fetchBrands(page, search);
     } catch (err: any) {
       toast.error(err.response?.data?.message || 'Delete failed');
     } finally {
@@ -105,12 +108,22 @@ export default function BrandManagePage() {
         </button>
       </div>
 
+      <SearchInput
+        value={search}
+        onChange={(value) => {
+          setPage(1);
+          setSearch(value);
+        }}
+        placeholder="Search brands..."
+        className="max-w-md mb-6"
+      />
+
       {loading ? (
         <LoadingSpinner text="Loading brands..." />
       ) : brands.length === 0 ? (
         <div className="glass rounded-2xl p-12 text-center">
           <Tag size={48} className="mx-auto text-text-muted mb-4" />
-          <p className="text-text-secondary">No brands found</p>
+          <p className="text-text-secondary">No brands found{search ? ` for "${search}"` : ''}</p>
           <button onClick={openCreate} className="mt-4 text-sm text-primary hover:text-primary-light font-medium">
             Create your first brand
           </button>
