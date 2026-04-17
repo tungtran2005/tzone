@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { devicesApi } from '../api/devices';
 import type { Device } from '../types';
@@ -13,24 +13,73 @@ export default function ComparePage() {
   const [loadingDevices, setLoadingDevices] = useState(true);
   const [selectorOpen, setSelectorOpen] = useState<number | null>(null);
   const [searchText, setSearchText] = useState('');
+  const [searchResults, setSearchResults] = useState<Device[]>([]);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const searchRequestIdRef = useRef(0);
 
   useEffect(() => {
-    devicesApi.getAll(1, 100)
-      .then(({ data }) => {
+    const bootstrap = async () => {
+      try {
+        const { data } = await devicesApi.getAll(1, 100);
         const devices = data.data?.devices || [];
         setAllDevices(devices);
 
         // Pre-select device from URL
         const preselected = searchParams.get('device');
-        if (preselected) {
-          const found = devices.find((d) => d.id === preselected);
-          if (found) {
-            setSelected([found, null]);
-          }
+        if (!preselected) return;
+
+        const found = devices.find((d) => d.id === preselected);
+        if (found) {
+          setSelected([found, null]);
+          return;
         }
-      })
-      .finally(() => setLoadingDevices(false));
-  }, []);
+
+        // Fallback when preselected device is not in the first page.
+        const detailRes = await devicesApi.getById(preselected);
+        if (detailRes.data.data) {
+          setSelected([detailRes.data.data, null]);
+        }
+      } finally {
+        setLoadingDevices(false);
+      }
+    };
+
+    bootstrap();
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (selectorOpen === null) {
+      setSearchLoading(false);
+      setSearchResults([]);
+      return;
+    }
+
+    const keyword = searchText.trim();
+    if (keyword.length < 2) {
+      setSearchLoading(false);
+      setSearchResults([]);
+      return;
+    }
+
+    const requestId = ++searchRequestIdRef.current;
+    const timer = setTimeout(async () => {
+      setSearchLoading(true);
+      try {
+        const { data } = await devicesApi.search(keyword, 1, 20);
+        if (searchRequestIdRef.current !== requestId) return;
+        setSearchResults(data.data?.devices || []);
+      } catch {
+        if (searchRequestIdRef.current !== requestId) return;
+        setSearchResults([]);
+      } finally {
+        if (searchRequestIdRef.current === requestId) {
+          setSearchLoading(false);
+        }
+      }
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchText, selectorOpen]);
 
   const handleSelect = (slotIdx: number, device: Device) => {
     setSelected((prev) => {
@@ -40,6 +89,7 @@ export default function ComparePage() {
     });
     setSelectorOpen(null);
     setSearchText('');
+    setSearchResults([]);
   };
 
   const handleRemove = (slotIdx: number) => {
@@ -56,11 +106,7 @@ export default function ComparePage() {
     }
   };
 
-  const filteredDevices = searchText
-    ? allDevices.filter((d) =>
-        d.model_name?.toLowerCase().includes(searchText.toLowerCase())
-      )
-    : allDevices;
+  const dropdownDevices = searchText.trim().length >= 2 ? searchResults : allDevices;
 
   const activeDevices = selected.filter(Boolean) as Device[];
 
@@ -140,7 +186,11 @@ export default function ComparePage() {
               </div>
             ) : (
               <button
-                onClick={() => setSelectorOpen(idx)}
+                onClick={() => {
+                  setSearchText('');
+                  setSearchResults([]);
+                  setSelectorOpen(idx);
+                }}
                 className="w-full glass rounded-2xl p-6 flex flex-col items-center justify-center gap-2 text-text-muted hover:text-text-secondary hover:border-border-light transition-all min-h-[88px]"
               >
                 <Plus size={20} />
@@ -165,26 +215,38 @@ export default function ComparePage() {
                   </div>
                 </div>
                 <div className="overflow-y-auto max-h-60">
-                  {filteredDevices.map((d) => (
-                    <button
-                      key={d.id}
-                      onClick={() => handleSelect(idx, d)}
-                      disabled={selected.some((s) => s?.id === d.id)}
-                      className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-surface-light transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                    >
-                      <div className="w-8 h-8 rounded-lg bg-surface-lighter flex items-center justify-center flex-shrink-0">
-                        {d.imageUrl ? (
-                          <img src={resolveDeviceImageUrl(d.imageUrl)} alt="" className="max-h-full w-auto object-contain" />
-                        ) : (
-                          <Smartphone size={14} className="text-text-muted" />
-                        )}
-                      </div>
-                      <span className="text-sm text-text-primary truncate">{d.model_name}</span>
-                    </button>
-                  ))}
+                  {searchLoading ? (
+                    <div className="px-4 py-3 text-sm text-text-muted">Searching devices...</div>
+                  ) : dropdownDevices.length === 0 ? (
+                    <div className="px-4 py-3 text-sm text-text-muted">
+                      {searchText.trim().length >= 2 ? 'No devices found' : 'No devices available'}
+                    </div>
+                  ) : (
+                    dropdownDevices.map((d) => (
+                      <button
+                        key={d.id}
+                        onClick={() => handleSelect(idx, d)}
+                        disabled={selected.some((s) => s?.id === d.id)}
+                        className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-surface-light transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                      >
+                        <div className="w-8 h-8 rounded-lg bg-surface-lighter flex items-center justify-center flex-shrink-0">
+                          {d.imageUrl ? (
+                            <img src={resolveDeviceImageUrl(d.imageUrl)} alt="" className="max-h-full w-auto object-contain" />
+                          ) : (
+                            <Smartphone size={14} className="text-text-muted" />
+                          )}
+                        </div>
+                        <span className="text-sm text-text-primary truncate">{d.model_name}</span>
+                      </button>
+                    ))
+                  )}
                 </div>
                 <button
-                  onClick={() => { setSelectorOpen(null); setSearchText(''); }}
+                  onClick={() => {
+                    setSelectorOpen(null);
+                    setSearchText('');
+                    setSearchResults([]);
+                  }}
                   className="w-full px-4 py-2.5 text-xs text-text-muted hover:bg-surface-light border-t border-border transition-colors"
                 >
                   Cancel
