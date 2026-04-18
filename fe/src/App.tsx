@@ -3,7 +3,8 @@ import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './contexts/AuthContext';
 import Layout from './components/layout/Layout';
 import AdminLayout from './components/layout/AdminLayout';
-import ProtectedRoute from './components/ProtectedRoute';
+// import ProtectedRoute from './components/ProtectedRoute';
+import AdminRoute from './components/AdminRoute';
 
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
@@ -51,18 +52,18 @@ function App() {
             <Route path="/compare" element={<ComparePage />} />
           </Route>
 
-          {/* Admin routes with admin layout */}
-          <Route
-            element={
-              <ProtectedRoute>
-                <AdminLayout />
-              </ProtectedRoute>
-            }
-          >
-            <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/admin/brands" element={<BrandManagePage />} />
-            <Route path="/admin/devices" element={<DeviceManagePage />} />
-          </Route>
+        {/* Admin routes with admin layout */}
+        <Route
+          element={
+            <AdminRoute>
+              <AdminLayout />
+            </AdminRoute>
+          }
+        >
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin/brands" element={<BrandManagePage />} />
+          <Route path="/admin/devices" element={<DeviceManagePage />} />
+        </Route>
         </Routes>
       </AuthProvider>
     </BrowserRouter>

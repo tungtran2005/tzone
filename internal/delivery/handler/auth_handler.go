@@ -48,7 +48,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
-	accessToken, refreshToken, user, err := h.authService.Login(req.Email, req.Password)
+	accessToken, refreshToken, user, roleName, err := h.authService.Login(req.Email, req.Password)
 
 	if err != nil {
 		response.Error(c, http.StatusUnauthorized, err.Error(), nil)
@@ -62,6 +62,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		"user": gin.H{
 			"id":    user.ID,
 			"email": user.Email,
+			"role":  roleName,
 		},
 	})
 }

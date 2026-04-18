@@ -1,43 +1,115 @@
 import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useSearchParams } from 'react-router-dom';
 import { brandsApi } from '../api/brands';
 import { devicesApi } from '../api/devices';
-import type { Brand, Device } from '../types';
+import type { Brand, Device, PaginationMeta } from '../types';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
+import Pagination from '../components/ui/Pagination';
 import { ChevronRight, Smartphone, ArrowLeft } from 'lucide-react';
 import { resolveDeviceImageUrl } from '../utils/resolveDeviceImageUrl';
 
+const DEFAULT_LIMIT = 12;
+
+const parsePage = (value: string | null) => {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed) || parsed < 1) return 1;
+  return Math.floor(parsed);
+};
+
 export default function BrandDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [brand, setBrand] = useState<Brand | null>(null);
   const [devices, setDevices] = useState<Device[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [pagination, setPagination] = useState<PaginationMeta | null>(null);
+  const [loadingBrand, setLoadingBrand] = useState(true);
+  const [loadingDevices, setLoadingDevices] = useState(true);
+
+  const currentPage = parsePage(searchParams.get('page'));
+  const totalDevices = pagination?.total ?? devices.length;
 
   useEffect(() => {
     if (!id) {
       setBrand(null);
-      setDevices([]);
+      setLoadingBrand(false);
       return;
     }
 
-    setLoading(true);
+    let cancelled = false;
+    setLoadingBrand(true);
 
-    Promise.all([
-      brandsApi.getById(id),
-      devicesApi.getByBrandId(id, 1, 100),
-    ])
-      .then(([brandRes, devicesRes]) => {
-        setBrand(brandRes.data.data || null);
-        setDevices(devicesRes.data.data?.devices || []);
+    brandsApi
+      .getById(id)
+      .then(({ data }) => {
+        if (!cancelled) {
+          setBrand(data.data || null);
+        }
       })
       .catch(() => {
-        setBrand(null);
-        setDevices([]);
+        if (!cancelled) {
+          setBrand(null);
+        }
       })
-      .finally(() => setLoading(false));
+      .finally(() => {
+        if (!cancelled) {
+          setLoadingBrand(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [id]);
 
-  if (loading) return <LoadingSpinner text="Loading brand..." />;
+  useEffect(() => {
+    if (!id) {
+      setDevices([]);
+      setPagination(null);
+      setLoadingDevices(false);
+      return;
+    }
+
+    let cancelled = false;
+    setLoadingDevices(true);
+    setDevices([]);
+    setPagination(null);
+
+    devicesApi
+      .getByBrandId(id, currentPage, DEFAULT_LIMIT)
+      .then(({ data }) => {
+        if (cancelled) return;
+
+        const nextDevices = data.data?.devices || [];
+        const nextPagination = data.data?.pagination || null;
+
+        if (nextPagination?.total_pages && currentPage > nextPagination.total_pages) {
+          const nextParams = new URLSearchParams(searchParams);
+          nextParams.set('page', String(nextPagination.total_pages));
+          setSearchParams(nextParams, { replace: true });
+          return;
+        }
+
+        setDevices(nextDevices);
+        setPagination(nextPagination);
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setDevices([]);
+          setPagination(null);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setLoadingDevices(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [id, currentPage, searchParams, setSearchParams]);
+
+  if (loadingBrand) return <LoadingSpinner text="Loading brand..." />;
 
   if (!brand) {
     return (
@@ -49,7 +121,6 @@ export default function BrandDetailPage() {
       </div>
     );
   }
-
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -69,12 +140,16 @@ export default function BrandDetailPage() {
         </div>
         <div>
           <h1 className="text-3xl font-bold text-text-primary">{brand.brand_name}</h1>
-          <p className="text-text-muted text-sm">{devices.length} device{devices.length !== 1 ? 's' : ''}</p>
+          <p className="text-text-muted text-sm">
+            {totalDevices} device{totalDevices !== 1 ? 's' : ''}
+          </p>
         </div>
       </div>
 
       {/* Devices grid */}
-      {devices.length === 0 ? (
+      {loadingDevices ? (
+        <LoadingSpinner text="Loading devices..." />
+      ) : devices.length === 0 ? (
         <div className="text-center py-20 glass rounded-2xl">
           <Smartphone size={48} className="mx-auto text-text-muted mb-4" />
           <p className="text-text-secondary">No devices found for this brand</p>
@@ -127,6 +202,17 @@ export default function BrandDetailPage() {
             </Link>
           ))}
         </div>
+      )}
+
+      {pagination && pagination.total_pages > 1 && (
+        <Pagination
+          pagination={pagination}
+          onPageChange={(page) => {
+            const nextParams = new URLSearchParams(searchParams);
+            nextParams.set('page', String(page));
+            setSearchParams(nextParams, { replace: true });
+          }}
+        />
       )}
     </div>
   );

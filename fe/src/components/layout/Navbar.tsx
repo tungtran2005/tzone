@@ -75,15 +75,19 @@ export default function Navbar() {
                 </button>
                 {userMenuOpen && (
                   <div className="absolute right-0 mt-2 w-48 glass rounded-xl shadow-2xl py-2 animate-fadeIn">
-                    <Link
-                      to="/admin"
-                      onClick={() => setUserMenuOpen(false)}
-                      className="flex items-center gap-2 px-4 py-2.5 text-sm text-text-secondary hover:text-text-primary hover:bg-surface-light transition-colors"
-                    >
-                      <Shield size={16} />
-                      Admin Panel
-                    </Link>
-                    <hr className="border-border my-1" />
+                    {user?.role === 'admin' && (
+                      <>
+                        <Link
+                          to="/admin"
+                          onClick={() => setUserMenuOpen(false)}
+                          className="flex items-center gap-2 px-4 py-2.5 text-sm text-text-secondary hover:text-text-primary hover:bg-surface-light transition-colors"
+                        >
+                          <Shield size={16} />
+                          Admin Panel
+                        </Link>
+                        <hr className="border-border my-1" />
+                      </>
+                    )}
                     <button
                       onClick={handleLogout}
                       className="flex items-center gap-2 w-full px-4 py-2.5 text-sm text-danger hover:bg-surface-light transition-colors"
@@ -146,14 +150,16 @@ export default function Navbar() {
             <hr className="border-border my-2" />
             {isAuthenticated ? (
               <>
-                <Link
-                  to="/admin"
-                  onClick={() => setMobileOpen(false)}
-                  className="flex items-center gap-2 px-4 py-3 rounded-lg text-sm text-text-secondary hover:text-text-primary hover:bg-surface-light"
-                >
-                  <Shield size={16} />
-                  Admin Panel
-                </Link>
+                {user?.role === 'admin' && (
+                  <Link
+                    to="/admin"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center gap-2 px-4 py-3 rounded-lg text-sm text-text-secondary hover:text-text-primary hover:bg-surface-light"
+                  >
+                    <Shield size={16} />
+                    Admin Panel
+                  </Link>
+                )}
                 <button
                   onClick={() => { handleLogout(); setMobileOpen(false); }}
                   className="flex items-center gap-2 w-full px-4 py-3 rounded-lg text-sm text-danger hover:bg-surface-light"

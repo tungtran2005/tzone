@@ -45,3 +45,32 @@ func (r *UserRepository) FindByEmail(email string) (*model.User, error) {
 	}
 	return &user, nil
 }
+
+// FindByEmailWithRole returns user with their role name
+func (r *UserRepository) FindByEmailWithRole(email string) (*model.User, string, error) {
+	var user model.User
+	var role model.Role
+
+	err := r.db.
+		Joins("JOIN user_roles ON user_roles.user_id = users.id").
+		Joins("JOIN roles ON roles.id = user_roles.role_id").
+		Where("users.email = ?", email).
+		Select("users.*").
+		First(&user).Error
+
+	if err != nil {
+		return nil, "", err
+	}
+
+	// Get the role name
+	err = r.db.
+		Joins("JOIN user_roles ON user_roles.role_id = roles.id").
+		Where("user_roles.user_id = ?", user.ID).
+		First(&role).Error
+
+	if err != nil {
+		return nil, "", err
+	}
+
+	return &user, role.Name, nil
+}

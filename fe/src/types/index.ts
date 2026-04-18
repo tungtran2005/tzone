@@ -170,6 +170,7 @@ export interface AuthResponse {
 export interface User {
   id: string;
   email: string;
+  role?: string;
 }
 
 // ==================== Request DTOs ====================

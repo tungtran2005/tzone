@@ -56,12 +56,12 @@ func (s *AuthService) Register(email string, password string) error {
 }
 
 // login
-func (s *AuthService) Login(email string, password string) (string, string, *model.User, error) {
+func (s *AuthService) Login(email string, password string) (string, string, *model.User, string, error) {
 
-	user, err := s.userRepo.FindByEmail(email)
+	user, roleName, err := s.userRepo.FindByEmailWithRole(email)
 
 	if err != nil {
-		return "", "", nil, errors.New("invalid email or password")
+		return "", "", nil, "", errors.New("invalid email or password")
 	}
 
 	err = bcrypt.CompareHashAndPassword(
@@ -70,13 +70,13 @@ func (s *AuthService) Login(email string, password string) (string, string, *mod
 	)
 
 	if err != nil {
-		return "", "", nil, errors.New("invalid email or password")
+		return "", "", nil, "", errors.New("invalid email or password")
 	}
 
 	jti := uuid.New()
 	accessToken, refreshToken, err := jwt.GenerateTokenPair(user.ID, jti)
 	if err != nil {
-		return "", "", nil, errors.New("failed to generate tokens")
+		return "", "", nil, "", errors.New("failed to generate tokens")
 	}
 
 	// Save Refresh Token in DB
@@ -86,10 +86,10 @@ func (s *AuthService) Login(email string, password string) (string, string, *mod
 		ExpiresAt: time.Now().Add(7 * 24 * time.Hour),
 	}
 	if err := s.tokenRepo.Create(rtRecord); err != nil {
-		return "", "", nil, errors.New("failed to save session")
+		return "", "", nil, "", errors.New("failed to save session")
 	}
 
-	return accessToken, refreshToken, user, nil
+	return accessToken, refreshToken, user, roleName, nil
 }
 
 // RefreshToken handles generating a new token pair from a valid refresh token
