@@ -3,7 +3,6 @@ import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './contexts/AuthContext';
 import Layout from './components/layout/Layout';
 import AdminLayout from './components/layout/AdminLayout';
-import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
 
 import HomePage from './pages/HomePage';
@@ -46,15 +45,8 @@ function App() {
           <Route element={<Layout />}>
             <Route path="/" element={<HomePage />} />
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/register" element={<RegisterPage />} />
-            <Route
-              path="/change-password"
-              element={
-                <ProtectedRoute>
-                  <ForgotPasswordPage />
-                </ProtectedRoute>
-              }
-            />
             <Route path="/brands" element={<BrandsPage />} />
             <Route path="/brands/:id" element={<BrandDetailPage />} />
             <Route path="/devices/:id" element={<DeviceDetailPage />} />

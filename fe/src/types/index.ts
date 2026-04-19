@@ -157,6 +157,17 @@ export interface LoginRequest {
 export interface RegisterRequest {
   email: string;
   password: string;
+  otp: string;
+}
+
+export interface SendOtpRequest {
+  email: string;
+}
+
+export interface ResetPasswordRequest {
+  email: string;
+  otp: string;
+  new_password: string;
 }
 
 export interface ChangePasswordRequest {

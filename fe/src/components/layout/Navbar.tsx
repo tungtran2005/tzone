@@ -1,7 +1,7 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { Menu, X, Smartphone, LogOut, Shield, ChevronDown, KeyRound } from 'lucide-react';
+import { Menu, X, Smartphone, LogOut, Shield, ChevronDown } from 'lucide-react';
 import DeviceSearchBar from './DeviceSearchBar';
 
 export default function Navbar() {
@@ -88,15 +88,6 @@ export default function Navbar() {
                         <hr className="border-border my-1" />
                       </>
                     )}
-                    <Link
-                      to="/change-password"
-                      onClick={() => setUserMenuOpen(false)}
-                      className="flex items-center gap-2 px-4 py-2.5 text-sm text-text-secondary hover:text-text-primary hover:bg-surface-light transition-colors"
-                    >
-                      <KeyRound size={16} />
-                      Change Password
-                    </Link>
-                    <hr className="border-border my-1" />
                     <button
                       onClick={handleLogout}
                       className="flex items-center gap-2 w-full px-4 py-2.5 text-sm text-danger hover:bg-surface-light transition-colors"
@@ -169,14 +160,6 @@ export default function Navbar() {
                     Admin Panel
                   </Link>
                 )}
-                <Link
-                  to="/change-password"
-                  onClick={() => setMobileOpen(false)}
-                  className="flex items-center gap-2 px-4 py-3 rounded-lg text-sm text-text-secondary hover:text-text-primary hover:bg-surface-light"
-                >
-                  <KeyRound size={16} />
-                  Change Password
-                </Link>
                 <button
                   onClick={() => { handleLogout(); setMobileOpen(false); }}
                   className="flex items-center gap-2 w-full px-4 py-3 rounded-lg text-sm text-danger hover:bg-surface-light"

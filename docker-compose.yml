@@ -58,6 +58,12 @@ services:
       SERVER_PORT: 8080
       MONGODB_URL: mongodb://mongo:27017/?directConnection=true
       POSTGRES_DSN: postgres://postgres:postgres@postgres:5432/tzone?sslmode=disable
+      JWT_SECRET: ${JWT_SECRET}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASS: ${SMTP_PASS}
+      SMTP_FROM: ${SMTP_FROM}
       RATE_LIMIT_ENABLED: "true"
       RATE_LIMIT_API_RPM: "120"
       RATE_LIMIT_API_BURST: "30"

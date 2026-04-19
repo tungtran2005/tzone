@@ -4,6 +4,8 @@ import type {
   AuthResponse,
   LoginRequest,
   RegisterRequest,
+  SendOtpRequest,
+  ResetPasswordRequest,
   ChangePasswordRequest,
 } from '../types';
 
@@ -13,6 +15,15 @@ export const authApi = {
 
   register: (data: RegisterRequest) =>
     client.post<ApiResponse>('/auth/register', data),
+
+  sendRegisterOtp: (data: SendOtpRequest) =>
+    client.post<ApiResponse>('/auth/register/send-otp', data),
+
+  sendResetPasswordOtp: (data: SendOtpRequest) =>
+    client.post<ApiResponse>('/auth/password/send-otp', data),
+
+  resetPassword: (data: ResetPasswordRequest) =>
+    client.post<ApiResponse>('/auth/password/reset', data),
 
   changePassword: (data: ChangePasswordRequest) =>
     client.post<ApiResponse>('/auth/password/change', data),

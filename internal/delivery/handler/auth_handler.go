@@ -18,6 +18,21 @@ func NewAuthHandler(authService *service.AuthService) *AuthHandler {
 	return &AuthHandler{authService}
 }
 
+func (h *AuthHandler) SendRegisterOTP(c *gin.Context) {
+	var req dto.SendOTPRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.Error(c, http.StatusBadRequest, err.Error(), nil)
+		return
+	}
+
+	if err := h.authService.SendRegisterOTP(req.Email); err != nil {
+		response.Error(c, http.StatusBadRequest, err.Error(), nil)
+		return
+	}
+
+	response.Success(c, http.StatusOK, "verification code sent", nil)
+}
+
 // register endpoint
 func (h *AuthHandler) Register(c *gin.Context) {
 	var req dto.RegisterRequest
@@ -27,14 +42,43 @@ func (h *AuthHandler) Register(c *gin.Context) {
 		return
 	}
 
-	err := h.authService.Register(req.Email, req.Password)
-
+	err := h.authService.Register(req.Email, req.Password, req.OTP)
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
 
 	response.Success(c, http.StatusCreated, "register success", nil)
+}
+
+func (h *AuthHandler) SendResetPasswordOTP(c *gin.Context) {
+	var req dto.SendOTPRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.Error(c, http.StatusBadRequest, err.Error(), nil)
+		return
+	}
+
+	if err := h.authService.SendResetPasswordOTP(req.Email); err != nil {
+		response.Error(c, http.StatusBadRequest, err.Error(), nil)
+		return
+	}
+
+	response.Success(c, http.StatusOK, "verification code sent", nil)
+}
+
+func (h *AuthHandler) ResetPassword(c *gin.Context) {
+	var req dto.ResetPasswordRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.Error(c, http.StatusBadRequest, err.Error(), nil)
+		return
+	}
+
+	if err := h.authService.ResetPassword(req.Email, req.OTP, req.NewPassword); err != nil {
+		response.Error(c, http.StatusBadRequest, err.Error(), nil)
+		return
+	}
+
+	response.Success(c, http.StatusOK, "password reset successfully", nil)
 }
 
 func (h *AuthHandler) ChangePassword(c *gin.Context) {
