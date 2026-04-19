@@ -8,7 +8,6 @@ import (
 	"github.com/LuuDinhTheTai/tzone/internal/dto"
 	"github.com/LuuDinhTheTai/tzone/internal/model"
 	"github.com/LuuDinhTheTai/tzone/internal/service"
-	"github.com/LuuDinhTheTai/tzone/util/handle_uploads"
 	"github.com/LuuDinhTheTai/tzone/util/response"
 	"github.com/gin-gonic/gin"
 )
@@ -48,7 +47,7 @@ func (h *DeviceHandler) CreateDevice(ctx *gin.Context) {
 		return
 	}
 
-	imageUrl, err := handle_uploads.SaveImage(formReq.Image)
+	imageUrl, err := h.deviceService.UploadDeviceImage(formReq.Image)
 	if err != nil {
 		log.Printf("❌ Failed to save image: %v", err)
 		response.Error(ctx, http.StatusInternalServerError, "Failed to upload image", []response.ErrorResponse{
@@ -294,7 +293,7 @@ func (h *DeviceHandler) UpdateDevice(ctx *gin.Context) {
 	}
 
 	if formReq.Image != nil {
-		imageUrl, err := handle_uploads.SaveImage(formReq.Image)
+		imageUrl, err := h.deviceService.UploadDeviceImage(formReq.Image)
 		if err != nil {
 			log.Printf("❌ Failed to save image: %v", err)
 			response.Error(ctx, http.StatusInternalServerError, "Failed to upload image", []response.ErrorResponse{

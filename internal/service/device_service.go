@@ -4,10 +4,12 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"mime/multipart"
 
 	"github.com/LuuDinhTheTai/tzone/internal/dto"
 	"github.com/LuuDinhTheTai/tzone/internal/model"
 	"github.com/LuuDinhTheTai/tzone/internal/repository"
+	"github.com/LuuDinhTheTai/tzone/util/handle_uploads"
 	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
@@ -63,6 +65,19 @@ func NewDeviceService(mongoDbRepo *repository.BrandRepository) *DeviceService {
 	return &DeviceService{
 		mongoDbRepo: mongoDbRepo,
 	}
+}
+
+func (s *DeviceService) UploadDeviceImage(file *multipart.FileHeader) (string, error) {
+	if file == nil {
+		return "", fmt.Errorf("image file is required")
+	}
+
+	imageURL, err := handle_uploads.SaveImage(file)
+	if err != nil {
+		return "", fmt.Errorf("failed to upload image: %w", err)
+	}
+
+	return imageURL, nil
 }
 
 // CreateDevice creates a new device
