@@ -18,6 +18,7 @@ export default function Navbar() {
     { to: '/', label: 'Home' },
     { to: '/brands', label: 'Brands' },
     { to: '/finder', label: 'Finder' },
+    { to: '/ai-advisor', label: 'AI Advisor' },
     { to: '/compare', label: 'Compare' },
     { to: '/favorites', label: 'Favorites' },
   ];

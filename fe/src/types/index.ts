@@ -251,3 +251,27 @@ export interface SyncFavoritesRequest {
   device_ids: string[];
 }
 
+export interface AIChatRequest {
+  message: string;
+  limit?: number;
+}
+
+export interface RecommendedDeviceCard {
+  id: string;
+  brand_name: string;
+  model_name: string;
+  imageUrl?: string;
+  image_url?: string;
+  detail_url: string;
+  os?: string;
+  chipset?: string;
+  memory?: string;
+  battery?: string;
+  price?: string;
+}
+
+export interface AIChatResponse {
+  reply: string;
+  devices: RecommendedDeviceCard[];
+}
+

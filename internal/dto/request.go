@@ -149,3 +149,18 @@ type UpdateDeviceFormRequest struct {
 	Image          *multipart.FileHeader `form:"image"`
 	Specifications string                `form:"specifications"`
 }
+
+type AIChatRecommendRequest struct {
+	Message string `json:"message" binding:"required,min=2,max=500"`
+	Limit   int    `json:"limit"`
+}
+
+func (r *AIChatRecommendRequest) Normalize() {
+	r.Message = strings.TrimSpace(r.Message)
+	if r.Limit <= 0 {
+		r.Limit = 3
+	}
+	if r.Limit > 6 {
+		r.Limit = 6
+	}
+}

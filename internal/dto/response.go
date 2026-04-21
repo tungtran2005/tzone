@@ -43,3 +43,21 @@ type DeviceListResponse struct {
 type FavoriteListResponse struct {
 	DeviceIDs []string `json:"device_ids"`
 }
+
+type RecommendedDeviceCard struct {
+	ID        string `json:"id"`
+	BrandName string `json:"brand_name"`
+	ModelName string `json:"model_name"`
+	ImageURL  string `json:"imageUrl"`
+	DetailURL string `json:"detail_url"`
+	OS        string `json:"os,omitempty"`
+	Chipset   string `json:"chipset,omitempty"`
+	Memory    string `json:"memory,omitempty"`
+	Battery   string `json:"battery,omitempty"`
+	Price     string `json:"price,omitempty"`
+}
+
+type AIChatRecommendResponse struct {
+	Reply   string                  `json:"reply"`
+	Devices []RecommendedDeviceCard `json:"devices"`
+}

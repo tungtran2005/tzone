@@ -20,6 +20,7 @@ import DeviceDetailPage from './pages/DeviceDetailPage';
 import ComparePage from './pages/ComparePage';
 import DeviceFinderPage from './pages/DeviceFinderPage';
 import FavoritesPage from './pages/FavoritesPage';
+import AIAdvisorPage from './pages/AIAdvisorPage';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import BrandManagePage from './pages/admin/BrandManagePage';
 import DeviceManagePage from './pages/admin/DeviceManagePage';
@@ -77,6 +78,7 @@ function AppContent() {
             <Route path="/finder" element={<DeviceFinderPage />} />
             <Route path="/compare" element={<ComparePage />} />
             <Route path="/favorites" element={<FavoritesPage />} />
+            <Route path="/ai-advisor" element={<AIAdvisorPage />} />
           </Route>
 
         {/* Admin routes with admin layout */}

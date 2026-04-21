@@ -13,6 +13,7 @@ type Config struct {
 	Server   ServerConfig
 	Database DatabaseConfig
 	Cache    CacheConfig
+	AI       AIConfig
 }
 
 type ServerConfig struct {
@@ -44,6 +45,14 @@ type CacheConfig struct {
 
 type RedisConfig struct {
 	URL string
+}
+
+type AIConfig struct {
+	GeminiAPIKey       string
+	GeminiModel        string
+	PhoneDataPath      string
+	MinioPublicBaseURL string
+	MinioBucket        string
 }
 
 // LoadEnv loads environment variables from .env file and returns configuration.
@@ -123,6 +132,43 @@ func LoadEnv() Config {
 		log.Println("✅ REDIS_URL configured")
 	}
 
+	geminiAPIKey := strings.TrimSpace(os.Getenv("GEMINI_API_KEY"))
+	if geminiAPIKey == "" {
+		log.Println("⚠️ GEMINI_API_KEY not set - AI advisor endpoint will return configuration error")
+	} else {
+		log.Println("✅ GEMINI_API_KEY configured")
+	}
+
+	geminiModel := strings.TrimSpace(os.Getenv("GEMINI_MODEL"))
+	if geminiModel == "" {
+		geminiModel = "gemini-1.5-flash"
+		log.Printf("⚠️ GEMINI_MODEL not set, using default: %s", geminiModel)
+	} else {
+		log.Printf("✅ GEMINI_MODEL: %s", geminiModel)
+	}
+
+	phoneDataPath := strings.TrimSpace(os.Getenv("AI_PHONE_DATA_PATH"))
+	if phoneDataPath == "" {
+		phoneDataPath = "phoneExample.json"
+		log.Printf("⚠️ AI_PHONE_DATA_PATH not set, using default: %s", phoneDataPath)
+	} else {
+		log.Printf("✅ AI_PHONE_DATA_PATH: %s", phoneDataPath)
+	}
+
+	minioPublicBaseURL := strings.TrimRight(strings.TrimSpace(os.Getenv("MINIO_PUBLIC_BASE_URL")), "/")
+	if minioPublicBaseURL == "" {
+		log.Println("⚠️ MINIO_PUBLIC_BASE_URL not set - AI catalog images will keep relative paths")
+	} else {
+		log.Printf("✅ MINIO_PUBLIC_BASE_URL: %s", minioPublicBaseURL)
+	}
+
+	minioBucket := strings.TrimSpace(os.Getenv("MINIO_BUCKET"))
+	if minioBucket == "" {
+		log.Println("⚠️ MINIO_BUCKET not set - AI catalog images will keep relative paths")
+	} else {
+		log.Printf("✅ MINIO_BUCKET: %s", minioBucket)
+	}
+
 	log.Println("✅ Configuration loaded successfully")
 
 	return Config{
@@ -145,6 +191,13 @@ func LoadEnv() Config {
 			Redis: RedisConfig{
 				URL: redisURL,
 			},
+		},
+		AI: AIConfig{
+			GeminiAPIKey:       geminiAPIKey,
+			GeminiModel:        geminiModel,
+			PhoneDataPath:      phoneDataPath,
+			MinioPublicBaseURL: minioPublicBaseURL,
+			MinioBucket:        minioBucket,
 		},
 	}
 }

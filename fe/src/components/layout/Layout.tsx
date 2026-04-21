@@ -1,8 +1,12 @@
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import Navbar from './Navbar';
 import Footer from './Footer';
+import FloatingAIChatbox from '../ai/FloatingAIChatbox';
 
 export default function Layout() {
+  const location = useLocation();
+  const hideFloatingChat = location.pathname === '/ai-advisor';
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -10,6 +14,7 @@ export default function Layout() {
         <Outlet />
       </main>
       <Footer />
+      {!hideFloatingChat && <FloatingAIChatbox />}
     </div>
   );
 }

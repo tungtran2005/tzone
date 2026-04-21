@@ -1179,6 +1179,7 @@ SERVER_PORT="8080"  # Có thể dùng quotes
 ## 📚 Tài Liệu Bổ Sung
 
 - [LOGGING_GUIDE.md](docs/LOGGING_GUIDE.md) - Chi tiết về logging system
+- [CACHE_STRATEGY.md](docs/CACHE_STRATEGY.md) - Redis cache strategy cho list/finder
 - [Gin Documentation](https://github.com/gin-gonic/gin)
 - [MongoDB Go Driver](https://www.mongodb.com/docs/drivers/go/)
 - [GORM Documentation](https://gorm.io/)

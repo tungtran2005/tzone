@@ -62,6 +62,10 @@ func (s *Server) MapHandlers() error {
 	deviceService := service.NewDeviceService(deviceRepo, cacheService)
 	favoriteService := service.NewFavoriteService(favoriteRepo, deviceRepo)
 	permissionService := service.NewPermissionService(permissionRepo)
+	aiService, err := service.NewAIChatService(s.cfg.AI)
+	if err != nil {
+		return err
+	}
 	log.Printf("✅ Services initialized")
 
 	// Init handler
@@ -71,6 +75,7 @@ func (s *Server) MapHandlers() error {
 	deviceHandler := handler.NewDeviceHandler(deviceService)
 	favoriteHandler := handler.NewFavoriteHandler(favoriteService)
 	authHandler := handler.NewAuthHandler(authService)
+	aiHandler := handler.NewAIHandler(aiService)
 	log.Printf("✅ Handlers initialized")
 
 	// Init route
@@ -80,6 +85,7 @@ func (s *Server) MapHandlers() error {
 	route.MapDeviceRoutes(s.r, deviceHandler, permissionService)
 	route.MapFavoriteRoutes(s.r, favoriteHandler)
 	route.MapAuthRoutes(s.r, authHandler)
+	route.MapAIRoutes(s.r, aiHandler)
 	log.Printf("✅ Routes initialized")
 
 	return nil

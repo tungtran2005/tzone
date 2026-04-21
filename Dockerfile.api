@@ -19,6 +19,7 @@ WORKDIR /app
 RUN mkdir -p /app/uploads/devices && chown -R app:app /app
 
 COPY --from=build /out/tzone /app/tzone
+COPY --from=build /src/phoneExample.json /app/phoneExample.json
 
 ENV SERVER_PORT=8080
 EXPOSE 8080
