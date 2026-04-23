@@ -6,6 +6,7 @@ import { Bot, MessageCircle, Send, Smartphone, X } from 'lucide-react';
 import { aiApi } from '../../api/ai';
 import type { RecommendedDeviceCard } from '../../types';
 import { resolveDeviceImageUrl } from '../../utils/resolveDeviceImageUrl';
+import { pushRecommendedDevices } from '../../utils/recommendedDevices';
 
 type ChatTurn = {
   id: string;
@@ -56,6 +57,7 @@ export default function FloatingAIChatbox() {
         },
         ...prev,
       ]);
+      pushRecommendedDevices(payload.devices || []);
       setMessage('');
     } catch (error) {
       setError(getAiErrorMessage(error));

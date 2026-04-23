@@ -6,6 +6,11 @@ import { Bot, Send, Smartphone } from 'lucide-react';
 import { aiApi } from '../api/ai';
 import type { RecommendedDeviceCard } from '../types';
 import { resolveDeviceImageUrl } from '../utils/resolveDeviceImageUrl';
+import {
+  clearRecommendedDevices,
+  getRecommendedDevices,
+  pushRecommendedDevices,
+} from '../utils/recommendedDevices';
 
 type ChatTurn = {
   id: string;
@@ -29,6 +34,7 @@ export default function AIAdvisorPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [history, setHistory] = useState<ChatTurn[]>([]);
+  const [suggestedDevices, setSuggestedDevices] = useState<RecommendedDeviceCard[]>(() => getRecommendedDevices());
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -55,6 +61,7 @@ export default function AIAdvisorPage() {
         },
         ...prev,
       ]);
+      setSuggestedDevices(pushRecommendedDevices(payload.devices || []));
       setMessage('');
     } catch (error) {
       setError(getAiErrorMessage(error));
@@ -96,6 +103,57 @@ export default function AIAdvisorPage() {
       </div>
 
       <div className="space-y-4">
+        {suggestedDevices.length > 0 && (
+          <div className="glass rounded-2xl p-5 sm:p-6">
+            <div className="flex items-center justify-between gap-3 mb-4">
+              <h2 className="text-lg font-semibold text-text-primary">Suggested Devices</h2>
+              <button
+                type="button"
+                onClick={() => {
+                  clearRecommendedDevices();
+                  setSuggestedDevices([]);
+                }}
+                className="text-xs text-text-muted hover:text-text-primary"
+              >
+                Clear
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {suggestedDevices.map((device) => {
+                const imageUrl = device.imageUrl || device.image_url;
+                return (
+                  <Link
+                    key={`saved-${device.id}`}
+                    to={device.detail_url || `/devices/${device.id}`}
+                    className="rounded-xl border border-border bg-surface-light p-3 hover:border-primary/40 transition-colors"
+                  >
+                    <div className="flex gap-3">
+                      <div className="w-20 h-20 rounded-lg bg-background flex items-center justify-center overflow-hidden shrink-0">
+                        {imageUrl ? (
+                          <img
+                            src={resolveDeviceImageUrl(imageUrl)}
+                            alt={device.model_name}
+                            className="max-h-full w-auto object-contain"
+                          />
+                        ) : (
+                          <Smartphone size={24} className="text-text-muted" />
+                        )}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-sm text-text-muted">{device.brand_name || 'Brand not specified'}</p>
+                        <h3 className="text-sm font-semibold text-text-primary truncate">{device.model_name}</h3>
+                        <p className="text-xs text-text-muted mt-1 truncate">{device.os || 'OS not specified'}</p>
+                        {device.price && <p className="text-xs text-primary mt-1">{device.price}</p>}
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {history.length === 0 ? (
           <div className="glass rounded-2xl p-8 text-center text-text-muted">
             Ask a question and the AI will suggest suitable devices.
