@@ -95,7 +95,7 @@ func (s *ReviewService) SetRating(userID string, deviceID string, req dto.SetRat
 		return nil, fmt.Errorf("device id is required")
 	}
 
-	review, err := s.reviewRepo.FindByUserAndDevice(parsedUserID, deviceID)
+	review, err := s.reviewRepo.FindRatingByUserAndDevice(parsedUserID, deviceID)
 	if err != nil {
 		if err != gorm.ErrRecordNotFound {
 			return nil, err
@@ -130,15 +130,8 @@ func (s *ReviewService) SetComment(userID string, deviceID string, req dto.SetCo
 		return nil, fmt.Errorf("comment is required")
 	}
 
-	review, err := s.reviewRepo.FindByUserAndDevice(parsedUserID, deviceID)
-	if err != nil {
-		if err != gorm.ErrRecordNotFound {
-			return nil, err
-		}
-		review = &model.Review{ID: uuid.New(), UserID: parsedUserID, DeviceID: deviceID, Rating: 0}
-	}
-
-	review.Comment = req.Comment
+	// Comments are append-only by default: one account can post multiple comments per device.
+	review := &model.Review{ID: uuid.New(), UserID: parsedUserID, DeviceID: deviceID, Rating: 0, Comment: req.Comment}
 	if err := s.reviewRepo.Save(review); err != nil {
 		return nil, err
 	}

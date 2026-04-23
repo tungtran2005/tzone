@@ -34,6 +34,7 @@ func (s *Server) MapHandlers() error {
 	_ = s.db.Exec("ALTER TABLE users ALTER COLUMN password_hash DROP NOT NULL").Error
 	_ = s.db.Exec("ALTER TABLE users ADD COLUMN IF NOT EXISTS google_sub text").Error
 	_ = s.db.Exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_users_google_sub ON users (google_sub)").Error
+	_ = s.db.Exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_reviews_user_device_rating_once ON reviews (user_id, device_id) WHERE rating > 0").Error
 
 	// Seed RBAC data
 	seed.SeedAll(s.db)

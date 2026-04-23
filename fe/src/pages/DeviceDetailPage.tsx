@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { isAxiosError } from 'axios';
@@ -93,11 +93,6 @@ export default function DeviceDetailPage() {
 
   const isAdmin = user?.email?.toLowerCase() === 'admin@tzone.com';
 
-  const currentUserComment = useMemo(() => {
-    if (!user?.id) return null;
-    return reviews.find((item) => item.user_id === user.id) || null;
-  }, [reviews, user?.id]);
-
   const loadComments = async (deviceId: string, page: number) => {
     setReviewsLoading(true);
     setReviewsError('');
@@ -178,13 +173,6 @@ export default function DeviceDetailPage() {
     };
   }, [device?.model_name]);
 
-  useEffect(() => {
-    if (!currentUserComment) return;
-    setCommentInput(currentUserComment.comment || '');
-    if (currentUserComment.rating > 0) {
-      setRatingInput(currentUserComment.rating);
-    }
-  }, [currentUserComment]);
 
   const handleSaveRating = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();

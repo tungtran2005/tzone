@@ -122,6 +122,15 @@ func (r *ReviewRepository) FindByUserAndDevice(userID uuid.UUID, deviceID string
 	return &review, nil
 }
 
+func (r *ReviewRepository) FindRatingByUserAndDevice(userID uuid.UUID, deviceID string) (*model.Review, error) {
+	var review model.Review
+	err := r.db.Where("user_id = ? AND device_id = ? AND rating > 0", userID, deviceID).First(&review).Error
+	if err != nil {
+		return nil, err
+	}
+	return &review, nil
+}
+
 func (r *ReviewRepository) IsAdmin(userID uuid.UUID) (bool, error) {
 	var count int64
 	err := r.db.Table("users").Where("id = ? AND email = ?", userID, "admin@tzone.com").Count(&count).Error
